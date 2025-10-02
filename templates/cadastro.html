@@ -34,15 +34,26 @@
 
     <section class="cadastro">
       <h2>Cadastro</h2>
-      <form>
-        <input type="nome" placeholder="Insira seu nome" required>
-        <input type="email" placeholder="Insira seu e-mail" required>
-        <input type="text" placeholder="Insira seu CPF" required>
-        <input type="telefone" placeholder="Insira seu telefone" required>
-        <input type="password" placeholder="Crie uma senha" required>
-        <input type="password" placeholder="Confirme sua senha" required>
-        <button type="submit"><a href="dashboardaluno.html"> Concluído </a></button>
+      <form action="{{ url_for('cadastro') }}" method="post" >
+
+
+        <input type="text" id="nome" name="nome" placeholder="Insira seu nome" required>
+        <input type="email" id="email" name="email" placeholder="Insira seu e-mail" required>
+        <input type="text" id="cpf" name="cpf" placeholder="Insira seu CPF" required>
+        <input type="number" id="telefone" name="telefone"  placeholder="Insira seu telefone" required>
+        <input type="password" id="senha" name="senha" placeholder="Crie uma senha" required>
+        <input type="password" id="confirma" name="confirma" placeholder="Confirme sua senha" required>
+        <button type="submit"> Concluído </button>
       </form>
+         {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="flash-messages">
+                    {% for category, message in messages %}
+                        <div class="flash {{ category }}">{{ message }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
     </section>
   </main> 
 </body>

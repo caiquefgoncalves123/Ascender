@@ -21,12 +21,13 @@
     <!-- Navegação -->
     <nav>
       <a href="home.html">Sobre</a>
+      <a href="{{ url_for('logout') }}" >Logout</a>
     </nav>
   </header>
 
   <!-- ===== MAIN ===== -->
   <main class="dashboard">
-    <h1>Olá, aluno!</h1>
+    <h1>Olá, {{ aluno }}!</h1>
 
     <!-- Caixa principal -->
     <section class="admcaixa">
