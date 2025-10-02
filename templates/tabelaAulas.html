@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tabela de aulas - Aluno</title>
+  <link rel="stylesheet" href="../static/style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&family=Poppins:wght@500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <header>
+    <div class="logo">
+      <img src="../static/img/logo-ascender.jpg" alt="Ascender Logo">
+    </div>
+    <nav>
+      <a href="home.html">Sobre</a>
+    </nav>
+  </header>
+
+  <main class="dashboard">
+    <h2 class="titulo-tabela">TABELA DE AULAS</h2>
+    <table class="tabela-aulas">
+      <thead>
+        <tr>
+          <th>Modalidade</th>
+          <th>Ações</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Muay-Thay</td>
+          <td onclick="esgotouAula(event)" class="editar"><a href="dashboardaluno.html" class="btn-editar">Inscrever</a></td>
+        </tr>
+        <tr>
+          <td>Musculação</td>
+          <td class="editar"><a href="dashboardaluno.html" class="btn-editar">Inscrever</a></td>
+        </tr>
+        <tr>
+          <td>Spinning</td>
+          <td class="editar"><a href="dashboardaluno.html" class="btn-editar">Inscrever</a></td>
+        </tr>
+        <tr>
+          <td>Yoga</td>
+          <td class="editar"><a href="dashboardaluno.html" class="btn-editar">Inscrever</a></td>
+        </tr>
+        <tr>
+          <td>Zumba</td>
+          <td class="editar"><a href="dashboardaluno.html" class="btn-editar">Inscrever</a></td>
+        </tr>
+        <tr>
+          <td>Natação</td>
+          <td class="editar"><a href="dashboardaluno.html" class="btn-editar">Inscrever</a></td>
+        </tr>
+      </tbody>
+    </table>
+  </main>
+
+  <script src="../static/script.js"></script>
+</body>
+
+  <!-- FOOTER -->
+  <footer class="rodape">
+    <div class="conteudo-rodape">
+      <div class="coluna-esquerda">
+        <h3>ASCENDER</h3>
+        <p><a href="home.html">Sobre nós</a></p>
+      </div>
+      <div class="coluna-direita">
+        <p>Rua das Acácias, 123</p>
+        <p>Bairro Jardim Primavera</p>
+        <p>São Paulo - SP</p>
+        <p>CEP: 01234-567</p>
+      </div>
+    </div>
+  </footer>
+</html>

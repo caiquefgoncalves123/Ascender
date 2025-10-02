@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Dashboard - Aluno</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="../static/style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&family=Poppins:wght@500;600;700&display=swap"
+    rel="stylesheet">
+</head>
+
+<body>
+  <!-- ===== HEADER ===== -->
+  <header>
+    <!-- Logo -->
+    <div class="logo">
+      <img src="../static/img/logo-ascender.jpg" alt="Ascender Logo">
+    </div>
+
+    <!-- Navegação -->
+    <nav>
+      <a href="home.html">Sobre</a>
+    </nav>
+  </header>
+
+  <!-- ===== MAIN ===== -->
+  <main class="dashboard">
+    <h1>Olá, aluno!</h1>
+
+    <!-- Caixa principal -->
+    <section class="admcaixa">
+      <div class="caixa">
+        <!-- Bloco de aulas do aluno -->
+        <div class="exclui">
+          <h2>Minhas aulas</h2>
+          <a href="tabelaAulas.html">+ Inscreva-se</a>
+
+          <div id="caixaa" class="caixa1">
+            <h3 id="spin">Spinning</h3>
+            <p>12/09 - 19h</p>
+            <a onclick="excluir(event)" href="">Excluir inscrição</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Botão de editar perfil -->
+    <div>
+      <a href="editaraluno.html">Editar perfil</a>
+    </div>
+  </main>
+
+    <script src="../static/script.js"></script>
+</body>
+  <!-- ===== FOOTER ===== -->
+  <footer class="rodape">
+    <div class="conteudo-rodape">
+      <div class="coluna-esquerda">
+        <h3>ASCENDER</h3>
+        <p><a href="home.html">Sobre nós</a></p>
+      </div>
+
+      <div class="coluna-direita">
+        <p>Rua das Acácias, 123</p>
+        <p>Bairro Jardim Primavera</p>
+        <p>São Paulo - SP</p>
+        <p>CEP: 01234-567</p>
+      </div>
+    </div>
+  </footer>
+
+</html>
