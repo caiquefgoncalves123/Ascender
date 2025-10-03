@@ -21,15 +21,35 @@
   <div class="container">
     <div class="cadastro">
       <h2>Edite o perfil</h2>
-      <form>
+      <form action="{{ url_for('editar_usuario', id=usuario[0]) }}" method="post" >
         <input name="nome" id="nome" type="text" value="{{ usuario[1] }}" placeholder="Nome">
-        <input name="=email" id="email" type="email" value="{{ usuario[2] }}" placeholder="Email">
-        <input name="telefone" id="telefone" type="text" value="{{ usuario[4] }}" placeholder="Telefone">
-        <input name="cpf" id="cpf" type="text" value="{{ usuario[5] }}" placeholder="CPF">
-        <input name="senha" id="senha" type="password" value="{{ usuario[3] }}" placeholder="Senha">
+        <input name="email" id="email" type="email" value="{{ usuario[2] }}" placeholder="Email">
+        <input name="cpf"
+         id="cpf"
+         type="text"
+         value="{{ usuario[5] }}"
+         placeholder="CPF"
+         pattern="[0-9]{11}"
+         maxlength="11"
+         inputmode="numeric"
+         oninput="this.value = this.value.replace(/\D/g, '').slice(0,11);"
+         title="Digite apenas números (11 dígitos)"
+         required>
+        <input name="telefone"
+         id="telefone"
+         type="text"
+         value="{{ usuario[4] }}"
+         placeholder="Telefone (DDD + número)"
+         pattern="[0-9]{11}"
+         maxlength="11"
+         inputmode="numeric"
+         oninput="this.value = this.value.replace(/\D/g, '').slice(0,11);"
+         title="Digite apenas números (11 dígitos)"
+         required>
+        <input name="senha" id="senha" type="password" placeholder="Senha">
 
         <div>
-          <button type="submit" class="save-btn"><a href="dashboardaluno.html">Salvar</a></button>
+          <button type="submit" class="save-btn">Salvar</button>
           <a href="dashboardaluno.html" class="delete-btn">Cancelar</a>
         </div>
       </form>
