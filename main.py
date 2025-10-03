@@ -31,7 +31,7 @@ def abrir_dashbordadm():
 @app.route('/abrir_dashbordaluno/<int:id>')
 def abrir_dashbordaluno(id):
     cursor = con.cursor()
-    cursor.execute('select nome, email,telefone, cpf from  usuario where id_usuario = ?', (id,))
+    cursor.execute('select id_usuario, nome, email,telefone, cpf from  usuario where id_usuario = ?', (id,))
     usuario = cursor.fetchone()
     return (render_template('dashboardaluno.html', usuario=usuario))
 
@@ -159,7 +159,7 @@ def logout():
 @app.route('/editar_usuario/<int:id>', methods=['GET', 'POST'])
 def editar_usuario(id):
     cursor = con.cursor()
-    cursor.execute('select id_usuario, nome, email, senha, telefone, cpf from usuario where id =?', (id,))
+    cursor.execute('select id_usuario, nome, email, senha, telefone, cpf from usuario where id_usuario =?', (id,))
     usuario = cursor.fetchone()
 
     if not usuario:
@@ -174,13 +174,20 @@ def editar_usuario(id):
         cpf = request.form['cpf']
         telefone = request.form['telefone']
 
-        cursor.execute("update usuarios set nome = ?, email = ?, senha = ?, cpf = ?, telefone=? where id = ?" ,
-        (nome, email, senha, telefone,cpf, id))
+        if senha:
+            senha_cripto = generate_password_hash(senha).decode('utf-8')
+
+        else:
+            senha_cripto = usuario[3]
+
+        print(senha_cripto)
+        cursor.execute("update usuario set nome = ?, email = ?, senha = ?, cpf = ?, telefone=? where id_usuario = ?" ,
+        (nome, email, senha_cripto,cpf,telefone, id))
 
         con.commit()
         flash("Usuário atualizado com sucesso")
-        return  redirect(url_for('abrir_dashbordaluno'))
-    cursor.close()
+        cursor.close()
+        return  redirect(url_for('abrir_dashbordaluno', id=usuario[0]))
     return render_template('editaraluno.html', usuario=usuario)
 
 
