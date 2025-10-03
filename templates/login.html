@@ -31,11 +31,21 @@
 
     <section class="login">
       <h2>Login</h2>
-      <form>
-        <input type="email" placeholder="Insira seu e-mail" required>
-        <input type="password" placeholder="Insira sua senha" required>
-        <button type="submit"> <a href="dashbord_adm.html"> Concluído </a> </button>
+      <form action="{{ url_for('login') }}" method="post" >
+        <input type="email" id="email" name="email" placeholder="Insira seu e-mail" required>
+        <input type="password" id="senha" name="senha" placeholder="Insira sua senha" required>
+         {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="flash-messages">
+                    {% for category, message in messages %}
+                        <div class="flash {{ category }}">{{ message }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+        <button type="submit">  Concluído </button>
       </form>
+
       <p class="cadastro">Não possui uma conta? <a href="cadastro.html"><br>Crie agora</a></p>
     </section>
   </main>
