@@ -45,6 +45,7 @@ body {
   display: flex;
   flex-direction: column;
 }
+
 /* =========================================================
    Header
    ========================================================= */
@@ -235,7 +236,7 @@ button,
   margin-top: -10px;
 }
 
-.login button a{
+.login button a {
   color: var(--branco);
 }
 
@@ -249,7 +250,7 @@ button,
   margin-top: 10px;
 }
 
-button a{
+button a {
   color: white;
 }
 
@@ -271,7 +272,7 @@ button:hover,
 }
 
 .delete-btn {
-  background-color: #E57373;
+  background-color: #E57373 !important;
 }
 
 .delete-btn:hover {
@@ -286,8 +287,8 @@ button:hover,
   max-width: 420px;
 }
 
-.texto{
-   font-size: 39px;
+.texto {
+  font-size: 39px;
   line-height: 1.3;
   color: #6381A8;
   font-weight: bold;
@@ -320,34 +321,35 @@ button:hover,
   text-align: center;
 }
 
-.moda2{
-   font-size: 31px;
+.moda2 {
+  font-size: 31px;
   margin-bottom: 12px;
   color: var(--azul);
-   text-align: start;
+  text-align: start;
 }
 
-.prof2{
-   font-size: 31px;
+.prof2 {
+  font-size: 31px;
   margin-bottom: 12px;
   color: var(--azul);
-   text-align: start;
+  text-align: start;
 }
 
 .cadastro h2 {
   font-size: 31px;
   margin-bottom: 12px;
   color: var(--azul);
-   text-align: start;
+  text-align: start;
 }
 
 .cadastro form {
   gap: 14px;
 }
 
-.cadastro button a{
+.cadastro button a {
   color: var(--branco);
 }
+
 /* =========================================================
    Text Container (hero style)
    ========================================================= */
@@ -388,16 +390,16 @@ button:hover,
   justify-content: left;
 }
 
-.caixa1{
+.caixa1 {
   background-color: rgb(239 224 224 / 50%);
 }
 
-.caixa2{
-    border: 1px solid #ddd;
-      padding: 15px;
-      max-width: 240px;
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
-      border-radius: 10px;
+.caixa2 {
+  border: 1px solid #ddd;
+  padding: 15px;
+  max-width: 240px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+  border-radius: 10px;
 }
 
 .caixa h2 {
@@ -417,7 +419,7 @@ button:hover,
   width: 1000px;
 }
 
-.relatorio{
+.relatorio {
   display: block;
   flex-wrap: nowrap;
 }
@@ -622,7 +624,7 @@ button:hover,
   border-radius: 15px;
 }
 
-.sobre-text{
+.sobre-text {
   margin-right: 100px;
 }
 
@@ -642,10 +644,11 @@ button:hover,
   font-size: 25px;
 }
 
-.acadehome{
+.acadehome {
   width: 900px;
   height: auto;
 }
+
 /* ====== CARDS HOME ====== */
 .cards {
   display: flex;
@@ -682,11 +685,11 @@ button:hover,
   height: 120px;
 }
 
-.card h3{
-     color: var(--branco);
+.card h3 {
+  color: var(--branco);
 }
 
-.card-img{
+.card-img {
   width: 125%;
   justify-self: center;
   display: flex;
@@ -817,6 +820,8 @@ button:hover,
     flex-direction: column;
     gap: 30px;
     text-align: center;
+    height: auto;
+    overflow: scroll;
   }
 
   .coluna-esquerda {
@@ -840,25 +845,32 @@ button:hover,
     text-align: center;
     gap: 30px;
   }
-  .hero-text, .hero-img {
+
+  .hero-text,
+  .hero-img {
     max-width: 100%;
   }
+
   .hero-text h1 {
     font-size: 2.5rem;
   }
+
   .hero-buttons {
     flex-direction: column;
     gap: 15px;
   }
+
   .sobre {
     flex-direction: column;
     text-align: center;
     gap: 30px;
     margin-top: 60px;
   }
+
   .sobre-text {
     margin: 0;
   }
+
   .cards {
     flex-direction: row;
     gap: 20px;
@@ -866,41 +878,47 @@ button:hover,
     margin-top: 100px;
   }
 
-  .sobre-img img{
+  .sobre-img img {
     display: none;
   }
 }
+
 @media (max-width: 500px) {
   .hero-text h1 {
     font-size: 2rem;
   }
+
   .hero-text p {
     font-size: 1rem;
   }
-  .btn-primary, .btn-secondary {
+
+  .btn-primary,
+  .btn-secondary {
     width: 100%;
     padding: 12px 0;
   }
+
   .cards .card {
     max-width: 100%;
     height: auto;
   }
+
   .card-img {
     width: 100%;
   }
 
-  .hero-img img{
+  .hero-img img {
     display: none;
   }
 
-  .sobre-img img{
+  .sobre-img img {
     display: none;
   }
 
-  .cards{
+  .cards {
     margin-top: 100px;
   }
-}   
+}
 
 /*REsponsividade dashboard*/
 @media (max-width: 850px) {
@@ -909,44 +927,57 @@ button:hover,
     gap: 20px;
     padding: 20px;
   }
+
   .container {
     flex-direction: column;
     gap: 20px;
     padding: 20px;
   }
+
   .intro {
     margin: 0;
     text-align: center;
   }
+
   .intro h2 {
     font-size: 32px;
   }
+
   .intro p {
     font-size: 20px;
   }
+
   .caixa {
     flex-direction: column;
     align-items: center;
   }
-  .caixa div, .caixa .aula-card {
+
+  .caixa div,
+  .caixa .aula-card {
     max-width: 100%;
   }
-  .admcaixa, .relatorio {
+
+  .admcaixa,
+  .relatorio {
     width: 100%;
     flex-direction: column;
     align-items: center;
   }
 }
+
 @media (max-width: 400px) {
   header {
     padding: 8px 10px;
   }
+
   header nav {
     gap: 10px;
   }
+
   .intro h2 {
     font-size: 28px;
   }
+
   .intro p {
     font-size: 18px;
   }
@@ -954,62 +985,82 @@ button:hover,
 
 /*Cadastro e login*/
 @media (max-width: 768px) {
-  .cadastro-aula, .cadastro {
+
+  .cadastro-aula,
+  .cadastro {
     max-width: 100%;
     padding: 0 20px;
   }
-  .cadastro-aula h2, .cadastro h2 {
+
+  .cadastro-aula h2,
+  .cadastro h2 {
     font-size: 24px;
   }
-  .cadastro-aula input, .cadastro input {
+
+  .cadastro-aula input,
+  .cadastro input {
     font-size: 16px;
   }
-  .cadastro-aula button, .cadastro button {
+
+  .cadastro-aula button,
+  .cadastro button {
     width: 100%;
   }
 }
+
 @media (max-width: 400px) {
-  .cadastro-aula h2, .cadastro h2 {
+
+  .cadastro-aula h2,
+  .cadastro h2 {
     font-size: 20px;
   }
-  .cadastro-aula input, .cadastro input {
+
+  .cadastro-aula input,
+  .cadastro input {
     font-size: 14px;
   }
 }
 
 /*Responsividade editar aula*/
-@media (max-width: 768px) { 
+@media (max-width: 768px) {
   .tabela-aulas {
     font-size: 14px;
   }
-  .tabela-aulas th, .tabela-aulas td {
+
+  .tabela-aulas th,
+  .tabela-aulas td {
     padding: 10px;
   }
-  .tabela-aulas th:nth-child(3), .tabela-aulas td:nth-child(3),
-  .tabela-aulas th:nth-child(4), .tabela-aulas td:nth-child(4) {
+
+  .tabela-aulas th:nth-child(3),
+  .tabela-aulas td:nth-child(3),
+  .tabela-aulas th:nth-child(4),
+  .tabela-aulas td:nth-child(4) {
     display: none;
   }
 
   .text-container p {
     display: none;
-}
+  }
 
-  .botoes{
+  .botoes {
     display: grid;
     gap: 10px;
     align-self: center;
   }
 
-  .text-container p{
+  .text-container p {
     font-size: 40px;
   }
-  }
+}
 
 @media (max-width: 400px) {
   .tabela-aulas {
     font-size: 12px;
   }
-  .tabela-aulas th, .tabela-aulas td {
+
+  .tabela-aulas th,
+  .tabela-aulas td {
     padding: 8px;
   }
 
@@ -1017,7 +1068,7 @@ button:hover,
     display: none;
   }
 
-  .botoes{
+  .botoes {
     display: grid;
   }
 }
@@ -1027,21 +1078,25 @@ button:hover,
     display: flex;
   }
 
-  .container{
+  .container {
     flex-direction: row;
   }
 
-  .text-container p{
+  .text-container p {
     font-size: 35px;
   }
 
-  .cadastro{
+  .cadastro {
     margin-top: 50px;
   }
 }
 
 /*Responsividade tabela aula*/
 @media (max-width: 768px) {
+  .rodape {
+    margin-top: 20px !important;
+  }
+
 
   .tabela-aulas,
   .tabela-aulas thead,
@@ -1063,6 +1118,7 @@ button:hover,
     border: 1px solid #ddd;
     padding: 10px;
     border-radius: 8px;
+    word-wrap: break-word;
   }
 
   .tabela-aulas td {
@@ -1085,12 +1141,13 @@ button:hover,
   main.dashboard {
     padding: 20px;
     display: block;
+    overflow: scroll;
   }
 }
 
 @media (max-width: 768px) {
-  tabelaAulaAdm 
-  .tabela-aulas th:nth-child(3),
+
+  tabelaAulaAdm .tabela-aulas th:nth-child(3),
   .tabela-aulas td:nth-child(3),
   .tabela-aulas th:nth-child(4),
   .tabela-aulas td:nth-child(4) {
@@ -1105,6 +1162,8 @@ button:hover,
     align-items: center;
     text-align: center;
     gap: 30px;
+    height: auto;
+    overflow: scroll;
   }
 
   .coluna-esquerda,
@@ -1121,10 +1180,12 @@ button:hover,
   .coluna-esquerda h3 {
     font-size: 18px;
   }
+
   .coluna-esquerda a,
   .coluna-direita p {
     font-size: 12px;
   }
+
   .redes-sociais img {
     width: 22px;
     height: 22px;
@@ -1133,14 +1194,17 @@ button:hover,
 
 /* Modal (fundo escuro) */
 .modal {
-  display: none; /* escondido por padrão */
+  display: none;
+  /* escondido por padrão */
   position: fixed;
-  z-index: 1000; /* fica por cima de tudo */
+  z-index: 1000;
+  /* fica por cima de tudo */
   left: 0;
   top: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0,0,0,0.6); /* fundo preto transparente */
+  background-color: rgba(0, 0, 0, 0.6);
+  /* fundo preto transparente */
   justify-content: center;
   align-items: center;
 }
@@ -1153,7 +1217,7 @@ button:hover,
   text-align: center;
   width: 80%;
   max-width: 400px;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
 }
 
 /* Botão de fechar (X) */
@@ -1226,56 +1290,58 @@ button:hover,
   padding: 40px 0;
   width: 100%;
   margin-top: 1110px;
+  height: auto;
+  overflow: scroll;
 }
 
 @media (max-width: 768px) {
- dashboard_adm header {
+  dashboard_adm header {
     padding: 8px 20px;
     margin-bottom: 325px;
   }
 
-    .dashboard>div {
-      display: flex;
-      justify-content: center;
-      gap: 10px;
-    }
+  .dashboard>div {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+  }
 
-        button,
-        .button,
-        .register-btn,
-        .save-btn,
-        .delete-btn,
-        .editar-btn,
-        .tabela-aulas button,
-        .cadastro-aula button,
-        .cadastro button,
-        .login button,
-        .dashboard>div a {
-          background-color: #6381A8;
-          border: none;
-          border-radius: 20px;
-          padding: 10px;
-          color: #fff;
-          font-size: 18px;
-          cursor: pointer;
-          width: 110px;
-          align-self: center;
-          margin-top: 12px;
-          text-decoration: none;
-          text-align: center;
-        }
-    
-        *,
-        *::before,
-        *::after {
-          margin: 0;
-          padding: 0;
-          box-sizing: border-box;
-          text-decoration: none;
-        }
+  button,
+  .button,
+  .register-btn,
+  .save-btn,
+  .delete-btn,
+  .editar-btn,
+  .tabela-aulas button,
+  .cadastro-aula button,
+  .cadastro button,
+  .login button,
+  .dashboard>div a {
+    background-color: #6381A8;
+    border: none;
+    border-radius: 20px;
+    padding: 10px;
+    color: #fff;
+    font-size: 18px;
+    cursor: pointer;
+    width: 123px;
+    align-self: center;
+    margin-top: 12px;
+    text-decoration: none;
+    text-align: center;
+  }
+
+  *,
+  *::before,
+  *::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    text-decoration: none;
+  }
 }
 
-.cabecalhoadm{
+.cabecalhoadm {
   margin-bottom: 15px;
 }
 
@@ -1291,3 +1357,17 @@ button:hover,
   align-items: stretch;
 }
 
+@media (max-width: 500px) {
+  .cards {
+    margin-top: 90px;
+    display: grid;
+  }
+}
+
+.rodape {
+  background-color: #5B7D9E;
+  color: #FFFFFF;
+  padding: 40px 0;
+  width: 100%;
+  margin-top: 303px;
+}
