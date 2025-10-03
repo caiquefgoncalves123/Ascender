@@ -34,15 +34,6 @@
       <form action="{{ url_for('login') }}" method="post" >
         <input type="email" id="email" name="email" placeholder="Insira seu e-mail" required>
         <input type="password" id="senha" name="senha" placeholder="Insira sua senha" required>
-         {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                <div class="flash-messages">
-                    {% for category, message in messages %}
-                        <div class="flash {{ category }}">{{ message }}</div>
-                    {% endfor %}
-                </div>
-            {% endif %}
-        {% endwith %}
         <button type="submit">  Concluído </button>
       </form>
 

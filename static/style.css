@@ -749,25 +749,6 @@ button:hover,
   opacity: 0.8;
 }
 
-/* Redes sociais */
-.redes-sociais {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-top: 20px;
-}
-
-.redes-sociais img {
-  width: 24px;
-  height: 24px;
-  filter: invert(100%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(100%) contrast(100%);
-  transition: opacity 0.3s ease;
-  cursor: pointer;
-}
-
-.redes-sociais img:hover {
-  opacity: 0.8;
-}
 
 /* Coluna direita */
 .coluna-direita {
@@ -833,9 +814,6 @@ button:hover,
     text-align: center;
   }
 
-  .redes-sociais {
-    justify-content: center;
-  }
 }
 
 /*REsponsividade home*/
@@ -920,7 +898,7 @@ button:hover,
   }
 }
 
-/*REsponsividade dashboard*/
+/*Responsividade dashboard*/
 @media (max-width: 850px) {
   main {
     flex-direction: column;
