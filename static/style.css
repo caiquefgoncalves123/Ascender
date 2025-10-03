@@ -832,3 +832,462 @@ button:hover,
     justify-content: center;
   }
 }
+
+/*REsponsividade home*/
+@media (max-width: 900px) {
+  .hero {
+    flex-direction: row;
+    text-align: center;
+    gap: 30px;
+  }
+  .hero-text, .hero-img {
+    max-width: 100%;
+  }
+  .hero-text h1 {
+    font-size: 2.5rem;
+  }
+  .hero-buttons {
+    flex-direction: column;
+    gap: 15px;
+  }
+  .sobre {
+    flex-direction: column;
+    text-align: center;
+    gap: 30px;
+    margin-top: 60px;
+  }
+  .sobre-text {
+    margin: 0;
+  }
+  .cards {
+    flex-direction: row;
+    gap: 20px;
+    padding: 40px 5%;
+    margin-top: 100px;
+  }
+
+  .sobre-img img{
+    display: none;
+  }
+}
+@media (max-width: 500px) {
+  .hero-text h1 {
+    font-size: 2rem;
+  }
+  .hero-text p {
+    font-size: 1rem;
+  }
+  .btn-primary, .btn-secondary {
+    width: 100%;
+    padding: 12px 0;
+  }
+  .cards .card {
+    max-width: 100%;
+    height: auto;
+  }
+  .card-img {
+    width: 100%;
+  }
+
+  .hero-img img{
+    display: none;
+  }
+
+  .sobre-img img{
+    display: none;
+  }
+
+  .cards{
+    margin-top: 100px;
+  }
+}   
+
+/*REsponsividade dashboard*/
+@media (max-width: 850px) {
+  main {
+    flex-direction: column;
+    gap: 20px;
+    padding: 20px;
+  }
+  .container {
+    flex-direction: column;
+    gap: 20px;
+    padding: 20px;
+  }
+  .intro {
+    margin: 0;
+    text-align: center;
+  }
+  .intro h2 {
+    font-size: 32px;
+  }
+  .intro p {
+    font-size: 20px;
+  }
+  .caixa {
+    flex-direction: column;
+    align-items: center;
+  }
+  .caixa div, .caixa .aula-card {
+    max-width: 100%;
+  }
+  .admcaixa, .relatorio {
+    width: 100%;
+    flex-direction: column;
+    align-items: center;
+  }
+}
+@media (max-width: 400px) {
+  header {
+    padding: 8px 10px;
+  }
+  header nav {
+    gap: 10px;
+  }
+  .intro h2 {
+    font-size: 28px;
+  }
+  .intro p {
+    font-size: 18px;
+  }
+}
+
+/*Cadastro e login*/
+@media (max-width: 768px) {
+  .cadastro-aula, .cadastro {
+    max-width: 100%;
+    padding: 0 20px;
+  }
+  .cadastro-aula h2, .cadastro h2 {
+    font-size: 24px;
+  }
+  .cadastro-aula input, .cadastro input {
+    font-size: 16px;
+  }
+  .cadastro-aula button, .cadastro button {
+    width: 100%;
+  }
+}
+@media (max-width: 400px) {
+  .cadastro-aula h2, .cadastro h2 {
+    font-size: 20px;
+  }
+  .cadastro-aula input, .cadastro input {
+    font-size: 14px;
+  }
+}
+
+/*Responsividade editar aula*/
+@media (max-width: 768px) { 
+  .tabela-aulas {
+    font-size: 14px;
+  }
+  .tabela-aulas th, .tabela-aulas td {
+    padding: 10px;
+  }
+  .tabela-aulas th:nth-child(3), .tabela-aulas td:nth-child(3),
+  .tabela-aulas th:nth-child(4), .tabela-aulas td:nth-child(4) {
+    display: none;
+  }
+
+  .text-container p {
+    display: none;
+}
+
+  .botoes{
+    display: grid;
+    gap: 10px;
+    align-self: center;
+  }
+
+  .text-container p{
+    font-size: 40px;
+  }
+  }
+
+@media (max-width: 400px) {
+  .tabela-aulas {
+    font-size: 12px;
+  }
+  .tabela-aulas th, .tabela-aulas td {
+    padding: 8px;
+  }
+
+  .text-container p {
+    display: none;
+  }
+
+  .botoes{
+    display: grid;
+  }
+}
+
+@media (min-width: 767px) {
+  .text-container p {
+    display: flex;
+  }
+
+  .container{
+    flex-direction: row;
+  }
+
+  .text-container p{
+    font-size: 35px;
+  }
+
+  .cadastro{
+    margin-top: 50px;
+  }
+}
+
+/*Responsividade tabela aula*/
+@media (max-width: 768px) {
+
+  .tabela-aulas,
+  .tabela-aulas thead,
+  .tabela-aulas tbody,
+  .tabela-aulas th,
+  .tabela-aulas td,
+  .tabela-aulas tr {
+    display: block;
+    width: 100%;
+  }
+
+  .tabela-aulas thead {
+    display: none;
+    /* Esconde os títulos da tabela */
+  }
+
+  .tabela-aulas tr {
+    margin-bottom: 15px;
+    border: 1px solid #ddd;
+    padding: 10px;
+    border-radius: 8px;
+  }
+
+  .tabela-aulas td {
+    text-align: left;
+    padding-left: 50%;
+    position: relative;
+    border: none;
+    border-bottom: 1px solid #eee;
+  }
+
+  .tabela-aulas td::before {
+    content: attr(data-label);
+    position: absolute;
+    left: 10px;
+    font-weight: bold;
+  }
+}
+
+@media (max-width: 768px) {
+  main.dashboard {
+    padding: 20px;
+    display: block;
+  }
+}
+
+@media (max-width: 768px) {
+  tabelaAulaAdm 
+  .tabela-aulas th:nth-child(3),
+  .tabela-aulas td:nth-child(3),
+  .tabela-aulas th:nth-child(4),
+  .tabela-aulas td:nth-child(4) {
+    display: flex;
+  }
+}
+
+/* ===== Responsividade ===== */
+@media (max-width: 768px) {
+  .conteudo-rodape {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 30px;
+  }
+
+  .coluna-esquerda,
+  .coluna-direita {
+    align-items: center;
+  }
+
+  .redes-sociais {
+    justify-content: center;
+  }
+}
+
+@media (max-width: 400px) {
+  .coluna-esquerda h3 {
+    font-size: 18px;
+  }
+  .coluna-esquerda a,
+  .coluna-direita p {
+    font-size: 12px;
+  }
+  .redes-sociais img {
+    width: 22px;
+    height: 22px;
+  }
+}
+
+/* Modal (fundo escuro) */
+.modal {
+  display: none; /* escondido por padrão */
+  position: fixed;
+  z-index: 1000; /* fica por cima de tudo */
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0,0,0,0.6); /* fundo preto transparente */
+  justify-content: center;
+  align-items: center;
+}
+
+/* Conteúdo do modal */
+.modal-content {
+  background: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  text-align: center;
+  width: 80%;
+  max-width: 400px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+}
+
+/* Botão de fechar (X) */
+.close {
+  color: #aaa;
+  float: right;
+  font-size: 24px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.close:hover {
+  color: red;
+}
+
+
+@media (max-width: 850px) {
+  .intro {
+    margin: 0;
+    text-align: center;
+    align-self: center;
+  }
+}
+
+@media (max-width: 850px) {
+  main {
+    flex-direction: row;
+    gap: 100px;
+    padding: 20px;
+  }
+}
+
+@media (max-width: 850px) {
+  .intro {
+    margin: 0;
+    text-align: center;
+    align-self: center;
+    display: none;
+  }
+}
+
+@media (min-width: 767px) {
+  .intro {
+    margin: 0;
+    text-align: center;
+    align-self: center;
+    display: row-reverse;
+  }
+}
+
+@media (min-width: 767px) {
+  .intro {
+    margin: 0;
+    text-align: center;
+    align-self: center;
+    display: row-reverse;
+    display: flow;
+  }
+}
+
+@media (min-width: 767px) {
+  .cadastro {
+    margin-top: 25px;
+  }
+}
+
+.rodapeadm {
+  background-color: #5B7D9E;
+  color: #FFFFFF;
+  padding: 40px 0;
+  width: 100%;
+  margin-top: 1110px;
+}
+
+@media (max-width: 768px) {
+ dashboard_adm header {
+    padding: 8px 20px;
+    margin-bottom: 325px;
+  }
+
+    .dashboard>div {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+    }
+
+        button,
+        .button,
+        .register-btn,
+        .save-btn,
+        .delete-btn,
+        .editar-btn,
+        .tabela-aulas button,
+        .cadastro-aula button,
+        .cadastro button,
+        .login button,
+        .dashboard>div a {
+          background-color: #6381A8;
+          border: none;
+          border-radius: 20px;
+          padding: 10px;
+          color: #fff;
+          font-size: 18px;
+          cursor: pointer;
+          width: 110px;
+          align-self: center;
+          margin-top: 12px;
+          text-decoration: none;
+          text-align: center;
+        }
+    
+        *,
+        *::before,
+        *::after {
+          margin: 0;
+          padding: 0;
+          box-sizing: border-box;
+          text-decoration: none;
+        }
+}
+
+.cabecalhoadm{
+  margin-bottom: 15px;
+}
+
+.dashboard section .caixa {
+  border: 1px solid #999;
+  border-radius: 10px;
+  padding: 20px;
+  max-width: 1160px;
+  min-height: 250px;
+  margin-bottom: 30px;
+  background: var(--branco);
+  justify-content: left;
+  align-items: stretch;
+}
+
