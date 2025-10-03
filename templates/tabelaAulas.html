@@ -29,27 +29,27 @@
       </thead>
       <tbody>
         <tr>
-          <td>Muay-Thay</td>
+          <td data-label="Modalidade">Muay-Thay</td>
           <td onclick="esgotouAula(event)" class="editar"><a href="dashboardaluno.html" class="btn-editar">Inscrever</a></td>
         </tr>
         <tr>
-          <td>Musculação</td>
+          <td data-label="Modalidade">Musculação</td>
           <td class="editar"><a href="dashboardaluno.html" class="btn-editar">Inscrever</a></td>
         </tr>
         <tr>
-          <td>Spinning</td>
+          <td data-label="Modalidade">Spinning</td>
           <td class="editar"><a href="dashboardaluno.html" class="btn-editar">Inscrever</a></td>
         </tr>
         <tr>
-          <td>Yoga</td>
+          <td data-label="Modalidade">Yoga</td>
           <td class="editar"><a href="dashboardaluno.html" class="btn-editar">Inscrever</a></td>
         </tr>
         <tr>
-          <td>Zumba</td>
+          <td data-label="Modalidade">Zumba</td>
           <td class="editar"><a href="dashboardaluno.html" class="btn-editar">Inscrever</a></td>
         </tr>
         <tr>
-          <td>Natação</td>
+          <td data-label="Modalidade">Natação</td>
           <td class="editar"><a href="dashboardaluno.html" class="btn-editar">Inscrever</a></td>
         </tr>
       </tbody>
@@ -58,6 +58,22 @@
 
   <script src="../static/script.js"></script>
 </body>
+
+  <!-- Modal Aula Esgotada -->
+  <div id="meuModal" class="modal">
+    <!-- Div principal do modal -->
+    <!-- A propriedade 'id' permite manipular esse modal com JavaScript. 
+           A classe 'modal' normalmente é usada no CSS para estilizar a tela de fundo escura e centralizar o conteúdo. -->
+    <div class="modal-content">
+      <!-- Conteúdo interno do modal -->
+      <!-- Esta div contém a caixa branca (ou estilizada) que aparece no centro da tela. 
+               A classe 'modal-content' serve para aplicar estilos específicos ao corpo do modal. -->
+      <span class="close" onclick="fecharModal()">&times;</span> <!-- &times = Botão de fechar (o 'x' no canto superior) -->
+      <p><strong>ESSA AULA ESGOTOU! 😢</strong></p> 
+      <!-- STRONG = NEGRITO -->
+      <p><strong>VOLTE MAIS TARDE PARA VER SE HÁ NOVAS VAGAS!</strong></p>
+    </div>
+  </div>
 
   <!-- FOOTER -->
   <footer class="rodape">
