@@ -25,10 +25,15 @@ def abrir_login():
 # @app.route('/abrir_cadastro')
 # def abrir_cadastro():
 #     return (render_template('cadastro.html'))
-
-@app.route('/abrir_dashbordaluno')
-def abrir_dashbordaluno():
-    return (render_template('dashboardaluno.html'))
+@app.route('/abrir_dashbordadm')
+def abrir_dashbordadm():
+    return (render_template('dashbord_adm.html'))
+@app.route('/abrir_dashbordaluno/<int:id>')
+def abrir_dashbordaluno(id):
+    cursor = con.cursor()
+    cursor.execute('select nome, email,telefone, cpf from  usuario where id_usuario = ?', (id,))
+    usuario = cursor.fetchone()
+    return (render_template('dashboardaluno.html', usuario=usuario))
 
 @app.route('/cadastro', methods= ['GET','POST'])
 def cadastro():
@@ -79,8 +84,8 @@ def cadastro():
                 return redirect(url_for('cadastro'))
 
             cursor.execute(
-                "INSERT INTO usuario (tipo, nome, email, cpf, telefone, senha) VALUES (?, ?, ?, ?, ?, ?)",
-                (2, nome, email, cpf, telefone, senha_cripto)
+                "INSERT INTO usuario (tipo, nome, email, cpf, telefone, senha, situacao, tentativas) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+                (2, nome, email, cpf, telefone, senha_cripto, 0, 0)
             )
             con.commit()
 
@@ -102,17 +107,41 @@ def login():
 
         cursor = con.cursor()
         try:
-            cursor.execute("SELECT senha, id_usuario, nome FROM usuario WHERE email = ?", (email,))
+            cursor.execute("SELECT senha, id_usuario, nome, situacao, tentativas, tipo FROM usuario WHERE email = ?", (email,))
             usuario = cursor.fetchone()
 
-            if usuario and check_password_hash(usuario[0], senha):
-                session['id_usuario'] = usuario[1]
-                flash('Login realizado com sucesso!', 'success')
-                return render_template('dashboardaluno.html', aluno=usuario[2])
-
-            else:
-                flash('E-mail ou senha incorretos. Tente novamente.', 'error')
+            if not usuario:
+                flash('Usuário não encontrado.', 'error')
                 return redirect(url_for('login'))
+
+
+            if usuario[3] == 1:
+                flash('Usuário está inativo. Contate o administrador.', 'error')
+                return redirect(url_for('login'))
+
+
+            if usuario and check_password_hash(usuario[0], senha):
+                cursor.execute("UPDATE usuario SET tentativas = 0 WHERE id_usuario = ?", (usuario[1],))
+                session['id_usuario'] = usuario[1]
+                con.commit()
+
+                if usuario[5] == 0:
+                    return redirect(url_for('abrir_dashbordadm'))
+
+                return redirect(url_for('abrir_dashbordaluno', id=usuario[1]))
+
+            if usuario[4] < 2 and usuario[5] != 0:
+                cursor.execute("UPDATE usuario SET tentativas = tentativas +1 WHERE id_usuario = ?", (usuario[1],))
+                con.commit()
+
+            if usuario[4] == 2 and usuario[5] != 0:
+                cursor.execute("UPDATE usuario SET tentativas = 3, situacao = 1 WHERE id_usuario = ?", (usuario[1],))
+                con.commit()
+                flash("Conta bloqueada após 3 tentativas. Contate o administrador.", "error")
+
+
+            flash('E-mail ou senha incorretos. Tente novamente.', 'error')
+            return redirect(url_for('login'))
         finally:
             cursor.close()
 
@@ -123,7 +152,36 @@ def logout():
     session.pop("id_usuario",None)
     return redirect(url_for('index'))
 
+# @app.route('/atualizar_usuario')
+# def atualizar_usuario():
+#     return render_template('editaraluno.html', titulo='Editar Usuario')
 
+@app.route('/editar_usuario/<int:id>', methods=['GET', 'POST'])
+def editar_usuario(id):
+    cursor = con.cursor()
+    cursor.execute('select id_usuario, nome, email, senha, telefone, cpf from usuario where id =?', (id,))
+    usuario = cursor.fetchone()
+
+    if not usuario:
+        cursor.close()
+        flash("Usuário não foi encontrado")
+        return redirect(url_for('cadastro'))
+
+    if request.method == 'POST':
+        nome = request.form['nome']
+        email = request.form['email']
+        senha = request.form['senha']
+        cpf = request.form['cpf']
+        telefone = request.form['telefone']
+
+        cursor.execute("update usuarios set nome = ?, email = ?, senha = ?, cpf = ?, telefone=? where id = ?" ,
+        (nome, email, senha, telefone,cpf, id))
+
+        con.commit()
+        flash("Usuário atualizado com sucesso")
+        return  redirect(url_for('abrir_dashbordaluno'))
+    cursor.close()
+    return render_template('editaraluno.html', usuario=usuario)
 
 
 
