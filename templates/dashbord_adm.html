@@ -16,6 +16,7 @@
         <div>
             <nav>
                 <a href="home.html">Sobre</a>
+                <a href="{{ url_for('logout') }}" >Logout</a>
             </nav>
         </div>
 
@@ -23,7 +24,7 @@
 
     <!-- Conteúdo principal -->
     <main class="dashboard">
-        <h1>Olá, adm!</h1>
+        <h1>Olá, {{ adm }}!</h1>
 
         <!-- Seção de aulas -->
         <section class="admcaixa">
