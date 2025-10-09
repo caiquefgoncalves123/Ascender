@@ -21,13 +21,13 @@
   <div class="container">
     <div class="cadastro">
       <h2>Edite o perfil</h2>
-      <form action="{{ url_for('editar_usuario', id=usuario[0]) }}" method="post" >
+      <form method="POST" action="{{ url_for('editar_usuario', id=usuario[0]) }}">
         <input name="nome" id="nome" type="text" value="{{ usuario[1] }}" placeholder="Nome">
         <input name="email" id="email" type="email" value="{{ usuario[2] }}" placeholder="Email">
         <input name="cpf"
          id="cpf"
          type="text"
-         value="{{ usuario[5] }}"
+         value="{{ usuario[6] }}"
          placeholder="CPF"
          pattern="[0-9]{11}"
          maxlength="11"

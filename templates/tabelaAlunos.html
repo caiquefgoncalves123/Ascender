@@ -3,8 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Painel - Tabela de Aulas</title>
-  <link rel="stylesheet" href="../static/style.css">
+  <title>Painel - Tabela de Alunos</title>
+
+  <!-- Mantém o seu CSS original -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&family=Poppins:wght@500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
@@ -12,10 +14,11 @@
   <!-- ===== HEADER ===== -->
   <header>
     <div class="logo">
-      <img src="../static/img/logo-ascender.jpg" alt="Ascender Logo">
+      <img src="{{ url_for('static', filename='img/logo-ascender.jpg') }}" alt="Ascender Logo">
     </div>
     <nav>
-      <a href="home.html">Sobre</a>
+      <a href="{{ url_for('index') }}">Home</a>
+      <a href="{{ url_for('abrir_dashbordadm', id=session['id_usuario']) }}">Voltar</a>
     </nav>
   </header>
 
@@ -31,30 +34,33 @@
           <th>Telefone</th>
           <th>CPF</th>
           <th>Ação</th>
+          <th>Situação</th>
+
         </tr>
       </thead>
-      <tbody>
+
+            <tbody>
+        {% for aluno in alunos %}
         <tr>
-          <td>Carlinhos Mais</td>
-          <td>carlinho@gmail.com</td>
-          <td>(11) 91234-5678</td>
-          <td>123.456.789-00</td>
-          <td class="editar"><a href="editarAlunoAdm.html">Editar</a></td>
+          <td>{{ aluno[1] }}</td> <!-- nome -->
+          <td>{{ aluno[2] }}</td> <!-- email -->
+          <td>{{ aluno[3] }}</td> <!-- telefone -->
+          <td>{{ aluno[4] }}</td> <!-- cpf -->
+          <td class="editar">
+            <a href="{{ url_for('editar_usuario', id=aluno[0]) }}">Editar</a>
+
+          </td>
+          <td class="editar"> <a href="{{ url_for('situacao', id=aluno[0]) }}"
+               onclick="return confirm('Deseja realmente alterar o status deste usuário?')">
+              {% if aluno[5] == 1 %}
+                Ativar
+              {% else %}
+                Bloquear
+              {% endif %}
+            </a>
+          </td>
         </tr>
-        <tr>
-          <td>Maria Souza</td>
-          <td>Mariazinha</td>
-          <td>(21) 98765-4321</td>
-          <td>987.654.321-00</td>
-          <td class="editar"><a href="editarAlunoAdm.html">Editar</a></td>
-        </tr>
-        <tr>
-          <td>Ana Costa</td>
-          <td>Aninha Costa</td>
-          <td>(31) 99876-5432</td>
-          <td>456.789.123-00</td>
-          <td class="editar"><a href="editarAlunoAdm.html">Editar</a></td>
-        </tr>
+        {% endfor %}
       </tbody>
     </table>
   </main>
@@ -64,7 +70,7 @@
     <div class="conteudo-rodape">
       <div class="coluna-esquerda">
         <h3>ASCENDER</h3>
-        <p><a href="home.html">Sobre nós</a></p>
+        <p><a href="{{ url_for('index') }}">Sobre nós</a></p>
       </div>
       <div class="coluna-direita">
         <p>Rua das Acácias, 123</p>
@@ -76,4 +82,3 @@
   </footer>
 </body>
 </html>
-
