@@ -182,6 +182,8 @@ def login():
 
     return render_template('login.html')
 
+
+
 # -------------------------------------------------------
 # LOGOUT
 # -------------------------------------------------------
@@ -272,16 +274,12 @@ def situacao(id):
             # Troca o status: se estiver ativo, bloqueia; se estiver bloqueado, ativa
             if status_atual == 1:
                 novo_status = 0
-                msg = "Usuário bloqueado com sucesso!"
             else:
                 novo_status = 1
-                msg = "Usuário ativado com sucesso!"
 
             # Atualiza no banco
             cursor.execute("UPDATE usuario SET situacao = ? WHERE id_usuario = ?", (novo_status, id))
             con.commit()
-
-            flash(msg, "success")
 
     finally:
         cursor.close()

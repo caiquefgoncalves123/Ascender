@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <title>Dashboard - Adm</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="../static/style.css">
+    <link rel="stylesheet" href=  "../static/style/style.css">
 </head>
 
 <body>
@@ -15,7 +15,7 @@
         </div>
         <div>
             <nav>
-                <a href="home.html">Sobre</a>
+                <a href="{{ url_for('index') }}">Sobre</a>
                 <a href="{{ url_for('logout') }}" >Logout</a>
             </nav>
         </div>
@@ -24,7 +24,7 @@
 
     <!-- Conteúdo principal -->
     <main class="dashboard">
-        <h1>Olá, {{ adm }}!</h1>
+        <h1>Olá, {{ usuario[1] }}! </h1>
 
         <!-- Seção de aulas -->
         <section class="admcaixa">
@@ -42,7 +42,7 @@
                 </div>
                         <div>
                         <h2>Alunos</h2>
-                        <a href="cadastroADM.html">+ Cadastrar aluno</a>
+                        <a href="{{ url_for('cadastro') }}">+ Cadastrar aluno</a>
                         <div class="caixa1">
 
                             <h3>Editar info</h3>

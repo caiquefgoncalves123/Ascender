@@ -6,7 +6,7 @@
   <title>Painel - Tabela de Alunos</title>
 
   <!-- Mantém o seu CSS original -->
-  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <link rel="stylesheet" href=  "../static/style/style.css">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&family=Poppins:wght@500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
@@ -17,7 +17,7 @@
       <img src="{{ url_for('static', filename='img/logo-ascender.jpg') }}" alt="Ascender Logo">
     </div>
     <nav>
-      <a href="{{ url_for('index') }}">Home</a>
+      <a href="{{ url_for('index') }}">Sobre</a>
       <a href="{{ url_for('abrir_dashbordadm', id=session['id_usuario']) }}">Voltar</a>
     </nav>
   </header>
@@ -42,12 +42,12 @@
             <tbody>
         {% for aluno in alunos %}
         <tr>
-          <td>{{ aluno[1] }}</td> <!-- nome -->
-          <td>{{ aluno[2] }}</td> <!-- email -->
-          <td>{{ aluno[3] }}</td> <!-- telefone -->
-          <td>{{ aluno[4] }}</td> <!-- cpf -->
+          <td data-label="Nome">{{ aluno[1] }}</td> <!-- nome -->
+          <td data-label="Email">{{ aluno[2] }}</td> <!-- email -->
+          <td data-label="Telefone">{{ aluno[3] }}</td> <!-- telefone -->
+          <td data-label="CPF">{{ aluno[4] }}</td> <!-- cpf -->
           <td class="editar">
-            <a href="{{ url_for('editar_usuario', id=aluno[0]) }}">Editar</a>
+            <a href="{{ url_for('editar_usuario', id=aluno[0]) }}"><button>Editar</button></a>
 
           </td>
           <td class="editar"> <a href="{{ url_for('situacao', id=aluno[0]) }}"

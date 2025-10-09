@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Editar Perfil - Ascender</title>
-  <link rel="stylesheet" href="../static/style.css">
+  <link rel="stylesheet" href=  "../static/style/style.css">
 </head>
 <body>
   <!-- HEADER -->
@@ -13,7 +13,7 @@
       <img src="../static/img/logo-ascender.jpg" alt="Logo Ascender">
     </div>
     <nav>
-      <a href="home.html">Sobre</a>
+      <a href="{{ url_for('index') }}">Sobre</a>
     </nav>
   </header>
 
@@ -50,7 +50,6 @@
 
         <div>
           <button type="submit" class="save-btn">Salvar</button>
-          <a href="dashboardaluno.html" class="delete-btn">Cancelar</a>
         </div>
       </form>
     </div>
