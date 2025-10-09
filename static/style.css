@@ -1030,6 +1030,8 @@ button:hover,
   .text-container p {
     font-size: 40px;
   }
+
+  
 }
 
 @media (max-width: 400px) {
@@ -1049,6 +1051,8 @@ button:hover,
   .botoes {
     display: grid;
   }
+
+  
 }
 
 @media (min-width: 767px) {
@@ -1349,3 +1353,22 @@ button:hover,
   width: 100%;
   margin-top: 303px;
 }
+
+/*olhinho*/
+.password-container {
+  position: relative;
+}
+.password-container .toggle-password {
+  position: absolute;
+  top: 50%;
+  right: 15px;
+  transform: translateY(-50%);
+  cursor: pointer;
+  width: 24px;
+  height: 24px;
+  opacity: 0.6;
+}
+.password-container .toggle-password:hover {
+  opacity: 1;
+}
+
