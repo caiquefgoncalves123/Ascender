@@ -81,12 +81,11 @@ def cadastro():
             return redirect(url_for('cadastro'))
 
         # Verifica o tamanho da senha
-        if len(senha) < 8 or len(senha) > 12:
-            flash('A senha deve ter entre 8 e 12 caracteres.', 'danger')
-            return redirect(url_for('cadastro'))
 
         # Verifica a complexidade da senha
+
         maiuscula = minuscula = numero = caracterpcd = False
+
         for s in senha:
             if s.isupper():
                 maiuscula = True
@@ -98,9 +97,14 @@ def cadastro():
                 caracterpcd = True
 
         # Se não atender aos critérios, bloqueia o cadastro
-        if not (maiuscula or minuscula or numero or caracterpcd):
+        if not (maiuscula and minuscula and numero and caracterpcd):
             flash('A senha deve conter ao menos uma letra maiúscula, uma minúscula, um número e um caractere especial.', 'danger')
             return redirect(url_for('cadastro'))
+
+        if len(senha) < 8 or len(senha) > 12:
+            flash('A senha deve ter entre 8 e 12 caracteres.', 'danger')
+            return redirect(url_for('cadastro'))
+
 
         # Criptografa a senha
         senha_cripto = generate_password_hash(senha).decode('utf-8')
@@ -160,7 +164,7 @@ def login():
                 session['usuario'] = usuario
                 con.commit()
 
-                # Tipo 0 = admin, Tipo 2 = aluno
+                #  Redireciona Tipo 0 = admin, Tipo 2 = aluno
                 if usuario[5] == 0:
                     return redirect(url_for('abrir_dashbordadm', id=usuario[1]))
                 return redirect(url_for('abrir_dashbordaluno', id=usuario[1]))
@@ -251,7 +255,6 @@ def ver_alunos():
         cursor.execute("SELECT id_usuario, nome, email, telefone, cpf, situacao FROM usuario WHERE tipo = 2")
         alunos = cursor.fetchall()
         qtd = len(alunos)
-        print(qtd)
     finally:
         cursor.close()
 
@@ -366,7 +369,7 @@ def abrir_tabelaprofessores():
 
 
 # -------------------------------------------------------
-# CADASTRO DE AULA
+# CADASTRO DE Professor
 # -------------------------------------------------------
 @app.route('/cadastroprofessor', methods=['GET', 'POST'])
 def cadastroprofessor():

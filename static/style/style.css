@@ -1125,6 +1125,7 @@ button:hover,
     padding: 20px;
     display: block;
     overflow: scroll;
+    margin-bottom: -70px;
   }
 }
 
