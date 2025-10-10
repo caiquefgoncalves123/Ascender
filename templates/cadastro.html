@@ -71,7 +71,12 @@
                 </div>
             {% endif %}
         {% endwith %}
-        <p class="cadastro">Já possui uma conta? <a href="{{ url_for('login') }}" ><br><strong>Login</strong></a></p>
+
+        {% if session.usuario is defined and session.usuario[5] == 0 %}
+            <p class="cadastro"><a href="{{ url_for('abrir_dashbordadm', id=session.usuario[1]) }}">Voltar</a></p>
+        {% else %}
+            <p class="cadastro">Já possui uma conta? <a href="{{ url_for('login') }}" ><br><strong>Login</strong></a></p>
+        {% endif %}
     </section>
   </main> 
 </body>

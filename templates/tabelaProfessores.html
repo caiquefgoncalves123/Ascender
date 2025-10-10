@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Painel - Tabela de Professores</title>
-  <link rel="stylesheet" href="../static/style.css">
+  <link rel="stylesheet" href=  "../static/style/style.css">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&family=Poppins:wght@500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
@@ -14,7 +14,8 @@
       <img src="../static/img/logo-ascender.jpg" alt="Ascender Logo">
     </div>
     <nav>
-      <a href="home.html">Sobre</a>
+      <a href="{{ url_for('index') }}">Sobre</a>
+      <a href="{{ url_for('abrir_dashbordadm', id=session['id_usuario']) }}">Voltar</a>
     </nav>
   </header>
 
@@ -27,7 +28,6 @@
         <tr>
            <th>Nome</th>
            <th>CPF</th>
-           <th>Modalidade</th>
            <th>Telefone</th>
            <th>Ações</th>
         </tr>
@@ -36,7 +36,6 @@
         <tr>
           <td data-label="Nome">João Silva</td>
           <td data-label="CPF">123.456.789-00</td>
-          <td data-label="Modalidade">Spinning</td>
           <td data-label="Telefone">(11) 91234-5678</td>
           <td class="editar">
             <a href="editarProfessor.html" class="edit-btn">Editar</a>
@@ -45,7 +44,6 @@
         <tr>
           <td data-label="Nome">Maria Oliveira</td>
           <td data-label="CPF">987.654.321-00</td>
-          <td data-label="Modalidade">Pilates</td>
           <td data-label="Telefone">(21) 99876-5432</td>
           <td class="editar">
             <a href="editarProfessor.html" class="edit-btn">Editar</a>

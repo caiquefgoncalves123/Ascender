@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Tabela de aulas - Aluno</title>
-  <link rel="stylesheet" href="../static/style.css">
+  <link rel="stylesheet" href=  "../static/style/style.css">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&family=Poppins:wght@500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
@@ -14,7 +14,8 @@
       <img src="../static/img/logo-ascender.jpg" alt="Ascender Logo">
     </div>
     <nav>
-      <a href="home.html">Sobre</a>
+      <a href="{{ url_for('index') }}">Sobre</a>
+      <a href="{{ url_for('abrir_dashbordaluno', id=session['id_usuario']) }}">Voltar</a>
     </nav>
   </header>
 
@@ -24,34 +25,22 @@
       <thead>
         <tr>
           <th>Modalidade</th>
+          <th>Professor</th>
+          <th>Dia</th>
+          <th>Horário</th>
           <th>Ações</th>
         </tr>
       </thead>
       <tbody>
         <tr>
           <td data-label="Modalidade">Muay-Thay</td>
+          <td data-label="Professor">Sarah</td>
+          <td data-label="Dia">Seg - Ter</td>
+          <td data-label="Horário">19:00</td>
           <td onclick="esgotouAula(event)" class="editar"><a href="dashboardaluno.html" class="btn-editar">Inscrever</a></td>
         </tr>
         <tr>
-          <td data-label="Modalidade">Musculação</td>
-          <td class="editar"><a href="dashboardaluno.html" class="btn-editar">Inscrever</a></td>
-        </tr>
-        <tr>
-          <td data-label="Modalidade">Spinning</td>
-          <td class="editar"><a href="dashboardaluno.html" class="btn-editar">Inscrever</a></td>
-        </tr>
-        <tr>
-          <td data-label="Modalidade">Yoga</td>
-          <td class="editar"><a href="dashboardaluno.html" class="btn-editar">Inscrever</a></td>
-        </tr>
-        <tr>
-          <td data-label="Modalidade">Zumba</td>
-          <td class="editar"><a href="dashboardaluno.html" class="btn-editar">Inscrever</a></td>
-        </tr>
-        <tr>
-          <td data-label="Modalidade">Natação</td>
-          <td class="editar"><a href="dashboardaluno.html" class="btn-editar">Inscrever</a></td>
-        </tr>
+
       </tbody>
     </table>
   </main>

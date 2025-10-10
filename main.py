@@ -147,6 +147,7 @@ def login():
                 flash('Usuário não encontrado.', 'error')
                 return redirect(url_for('login'))
 
+
             # Se o usuário está inativo, bloqueia o login
             if usuario[3] == 1:
                 flash('Usuário está inativo. Contate o administrador.', 'error')
@@ -189,7 +190,8 @@ def login():
 # -------------------------------------------------------
 @app.route('/logout')
 def logout():
-    session.pop("id_usuario", None)  # Remove o ID do usuário da sessão
+    session.pop("id_usuario", None)
+    session.pop("usuario", None)# Remove o ID do usuário da sessão
     return redirect(url_for('index'))
 
 # -------------------------------------------------------
@@ -248,10 +250,12 @@ def ver_alunos():
     try:
         cursor.execute("SELECT id_usuario, nome, email, telefone, cpf, situacao FROM usuario WHERE tipo = 2")
         alunos = cursor.fetchall()
+        qtd = len(alunos)
+        print(qtd)
     finally:
         cursor.close()
 
-    return render_template('tabelaAlunos.html', alunos=alunos)
+    return render_template('tabelaAlunos.html', alunos=alunos, qtd=qtd)
 
 # -------------------------------------------------------
 # ATIVAR / BLOQUEAR USUÁRIO
@@ -286,6 +290,118 @@ def situacao(id):
 
     return redirect(url_for('ver_alunos'))
 
+# -------------------------------------------------------
+# Inscreva-se
+# -------------------------------------------------------
+@app.route('/abrir_tabelaaulas')
+def abrir_tabelaaulas():
+    if 'id_usuario' not in session:
+        return redirect(url_for('login'))
+
+    cursor = con.cursor()
+    try:
+        cursor.execute("SELECT id_aulas, id_usuario, id_modalidade, capacidade, hora, segunda, terca, quarta, quinta, sexta, sabado FROM aulas WHERE id_usuario = ?",
+                       (session['id_usuario'],))
+        aulas = cursor.fetchall()
+    finally:
+        cursor.close()
+
+    return render_template('tabelaAulas.html', aulas=aulas)
+
+
+
+# -------------------------------------------------------
+# Tabela Aula Adm
+# -------------------------------------------------------
+@app.route('/abrir_tabelaaulasadm')
+def abrir_tabelaaulasadm():
+    if 'id_usuario' not in session:
+        return redirect(url_for('login'))
+
+    cursor = con.cursor()
+    try:
+        cursor.execute("SELECT id_aulas, id_usuario, id_modalidade, capacidade, hora, segunda, terca, quarta, quinta, sexta, sabado FROM aulas WHERE id_usuario = ?",
+                       (session['id_usuario'],))
+        aulas = cursor.fetchall()
+    finally:
+        cursor.close()
+
+    return render_template('tabelaAulaAdm.html', aulas=aulas)
+
+
+# -------------------------------------------------------
+# Tabela Modalidade
+# -------------------------------------------------------
+@app.route('/abrir_tabelamodalidade')
+def abrir_tabelamodalidade():
+    if 'id_usuario' not in session:
+        return redirect(url_for('login'))
+
+    cursor = con.cursor()
+    try:
+        cursor.execute("SELECT id_modalidade, nome FROM modalidade WHERE id_modalidade = ?",
+                       (session['id_usuario'],))
+        modalidade= cursor.fetchall()
+    finally:
+        cursor.close()
+
+    return render_template('tabelaModalidade.html', modalidade=modalidade)
+
+# -------------------------------------------------------
+# Tabela professores
+# -------------------------------------------------------
+@app.route('/abrir_tabelaprofessores')
+def abrir_tabelaprofessores():
+    if 'id_usuario' not in session:
+        return redirect(url_for('login'))
+
+    cursor = con.cursor()
+    try:
+        cursor.execute("SELECT id_usuario, nome, email, telefone, cpf, situacao FROM usuario WHERE tipo = 1")
+        professor = cursor.fetchall()
+    finally:
+        cursor.close()
+
+    return render_template('tabelaProfessores.html', professor=professor)
+
+
+# -------------------------------------------------------
+# CADASTRO DE AULA
+# -------------------------------------------------------
+@app.route('/cadastroprofessor', methods=['GET', 'POST'])
+def cadastroprofessor():
+    print()
+    if 'id_usuario' not in session:
+        return redirect(url_for('login'))
+
+    if request.method == 'POST':
+        # Coleta dados do formulário
+        nome = request.form['nome']
+        email = request.form['email']
+        cpf = request.form['cpf']
+        telefone = request.form['telefone']
+        cursor = con.cursor()
+        try:  # tratamento de erro
+            # Verifica se o e-mail já está cadastrado
+            cursor.execute("SELECT 1 FROM usuario WHERE email = ?", (email,))
+            if cursor.fetchone():  # Verifica se a consulta retornou algum resultado
+                flash('Esse e-mail já está cadastrado!', 'error')
+                return redirect(url_for('cadastroprofessor'))
+
+            # Insere novo usuário (tipo = 2 → aluno)
+            cursor.execute(
+                "INSERT INTO usuario (tipo, nome, email, cpf, telefone) VALUES (?, ?, ?, ?, ?)",
+                (1, nome, email, cpf, telefone)
+            )
+            con.commit()
+            usuario = session['id_usuario']
+            flash('Professor cadastrado com sucesso!', 'success')
+            return render_template('dashbord_adm.html', usuario=usuario)
+
+        finally:
+            cursor.close()
+
+    return render_template('cadastroProfessor.html')
 
 # -------------------------------------------------------
 # EXECUÇÃO DA APLICAÇÃO

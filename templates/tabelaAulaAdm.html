@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Painel - Tabela de Aulas</title>
-  <link rel="stylesheet" href=  "../static/style.css">
+  <link rel="stylesheet" href=  "../static/style/style.css">
   <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&family=Poppins:wght@500;600;700&display=swap" rel="stylesheet">
 </head>
@@ -15,7 +15,8 @@
       <img src="../static/img/logo-ascender.jpg" alt="Ascender Logo">
     </div>
     <nav>
-      <a href="home.html">Sobre</a>
+      <a href="{{ url_for('index') }}">Sobre</a>
+      <a href="{{ url_for('abrir_dashbordadm', id=session['id_usuario']) }}">Voltar</a>
     </nav>
   </header>
 
@@ -29,6 +30,7 @@
           <th>Modalidade</th>
           <th>Horário</th>
           <th>Professor</th>
+          <th>Dia</th>
           <th></th>
         </tr>
       </thead>
@@ -37,30 +39,7 @@
           <td data-label="Modalidade">Musculação</td>
           <td data-label="Horário">08:00</td>
           <td data-label="Professor">João Silva</td>
-          <td class="editar"><a href="editarAula.html"><button>Editar</button></a></td>
-        </tr>
-        <tr>
-          <td data-label="Modalidade">Pilates</td>
-          <td data-label="Horário">09:30</td>
-          <td data-label="Professor">Maria Souza</td>
-          <td class="editar"><a href="editarAula.html"><button>Editar</button></a></td>
-        </tr>
-        <tr>
-          <td data-label="Modalidade">Yoga</td>
-          <td data-label="Horário">11:00</td>
-          <td data-label="Professor">Ana Costa</td>
-          <td class="editar"><a href="editarAula.html"><button>Editar</button></a></td>
-        </tr>
-        <tr>
-          <td data-label="Modalidade">Crossfit</td>
-          <td data-label="Horário">14:00</td>
-          <td data-label="Professor">Paulo Mendes</td>
-          <td class="editar"><a href="editarAula.html"><button>Editar</button></a></td>
-        </tr>
-        <tr>
-          <td data-label="Modalidade">Funcional</td>
-          <td data-label="Horário">16:00</td>
-          <td>Lucas Oliveira</td>
+          <td data-label="Dia">Seg - Ter</td>
           <td class="editar"><a href="editarAula.html"><button>Editar</button></a></td>
         </tr>
       </tbody>

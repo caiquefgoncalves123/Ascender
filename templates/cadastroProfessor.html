@@ -24,19 +24,32 @@
     <div class="container">
         <div class="form-container">
             <h2 class="prof2">Cadastre um(a) professor(a)</h2>
-            <form>
-                <input type="text" id="nome" placeholder="Digite o nome do professor">
+<form action="{{ url_for('cadastroprofessor') }}" method="post" >
 
-                <input type="text" id="cpf" placeholder="Digite o cpf do professor">
 
-                <input type="text" id="modalidade" placeholder="Digite a modalidade">
-
-                <input type="text" id="telefone" placeholder="Digite o telefone do professor">
-                <div>
-          <button type="submit" class="save-btn"><a href="tabelaProfessores.html">Salvar</a></button>
-          <a href="dashbord_adm.html" class="delete-btn">Cancelar</a>
-        </div>
-            </form>
+        <input type="text" id="nome" name="nome" placeholder="Digite seu nome:" required>
+        <input type="email" id="email" name="email" placeholder="Digite seu e-mail:" required>
+        <input type="text"
+           id="cpf"
+           name="cpf"
+           placeholder="Digite seu CPF:"
+           pattern="[0-9]{11}"
+           maxlength="11"
+           inputmode="numeric"
+           oninput="this.value = this.value.replace(/\D/g, '').slice(0,11);"
+           title="Digite apenas números (11 dígitos)" required>
+        <input type="text"
+           id="telefone"
+           name="telefone"
+           placeholder="Digite seu telefone:"
+           pattern="[0-9]{11}"
+           maxlength="11"
+           inputmode="numeric"
+           oninput="this.value = this.value.replace(/\D/g, '').slice(0,11);"
+           title="Digite apenas números (11 dígitos, incluindo DDD)"
+           required>
+        <button type="submit"> Concluído </button>
+      </form>
         </div>
         <div class="text-container">
             <p>Cadastre um novo professor para fazer parte da nossa equipe!</p>

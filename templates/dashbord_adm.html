@@ -6,7 +6,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href=  "../static/style/style.css">
 </head>
-
 <body>
     <!-- Barra de navegação -->
     <header>
@@ -35,9 +34,8 @@
                     <a href="cadastroAula.html">+ Cadastrar aula</a>
 
                     <div class="caixa1">
-                        <h3>Editar info</h3>
                         <p>Total : 12</p>
-                        <a href="../templates/tabelaAulaAdm.html">Ver detalhes</a>
+                        <a href="{{ url_for('abrir_tabelaaulasadm') }}">Ver detalhes</a>
                     </div>
                 </div>
                         <div>
@@ -45,19 +43,19 @@
                         <a href="{{ url_for('cadastro') }}">+ Cadastrar aluno</a>
                         <div class="caixa1">
 
-                            <h3>Editar info</h3>
-                            <p>Total : 50</p>
+                            <p>  Total: {{ qtd }} </p>
                             <a href="{{ url_for('ver_alunos') }}" class="botao-detalhes">Ver Detalhes</a>
                         </div>
                            </div>
 
                            <div>
                                 <h2>Professores</h2>
-                                <a href="cadastroProfessor.html">+ Cadastrar professor</a>
+                                <a href="{{ url_for('cadastroprofessor') }}">+ Cadastrar professor</a>
+
 
                                 <div class="caixa1">
                                     <p>Total : 8</p>
-                                    <a href="tabelaProfessores.html">Ver detalhes</a>
+                                    <a href="{{ url_for('abrir_tabelaprofessores') }}">Ver detalhes</a>
                                 </div>
                            </div>
 
@@ -66,9 +64,8 @@
                                 <a href="cadastroModalidade.html">+ Cadastrar modalidade</a>
 
                                 <div class="caixa1">
-                                    <h3>Editar info</h3>
                                     <p>Total : 5</p>
-                                    <a href="tabelaModalidade.html">Ver detalhes</a>
+                                    <a href="{{ url_for('abrir_tabelamodalidade') }}">Ver detalhes</a>
                                 </div>
                            </div>
 
@@ -88,7 +85,6 @@
         </section>
     </main>
 </body>
-
     <footer style="max-width: 100%;" class="rodape">
         <div class="conteudo-rodape">
             <div class="coluna-esquerda">
@@ -104,5 +100,4 @@
             </div>
         </div>
     </footer>
-
 </html>
