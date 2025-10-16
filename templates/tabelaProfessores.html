@@ -26,29 +26,33 @@
     <table class="tabela-aulas">
       <thead>
         <tr>
-           <th>Nome</th>
-           <th>CPF</th>
-           <th>Telefone</th>
-           <th>Ações</th>
+          <th>Nome</th>
+          <th>Email</th>
+          <th>Telefone</th>
+          <th>CPF</th>
+          <th>Ação</th>
+
         </tr>
       </thead>
-      <tbody>
+
+            <tbody>
+        {% for professor in professor %}
         <tr>
-          <td data-label="Nome">João Silva</td>
-          <td data-label="CPF">123.456.789-00</td>
-          <td data-label="Telefone">(11) 91234-5678</td>
+          <td data-label="Nome">{{ professor[1] }}</td> <!-- nome -->
+          <td data-label="Email">{{ professor[2] }}</td> <!-- email -->
+          <td data-label="Telefone">{{ professor[3] }}</td> <!-- telefone -->
+          <td data-label="CPF">{{ professor[4] }}</td> <!-- cpf -->
           <td class="editar">
-            <a href="editarProfessor.html" class="edit-btn">Editar</a>
+            <a href="{{ url_for('editar_professor', id=professor[0]) }}"><button>Editar</button></a>
+
+
+          </td>
+          <td class="editar"> <a href="{{ url_for('situacao', id=professor[0]) }}"
+               onclick="return confirm('Deseja realmente alterar o status deste usuário?')">
+            </a>
           </td>
         </tr>
-        <tr>
-          <td data-label="Nome">Maria Oliveira</td>
-          <td data-label="CPF">987.654.321-00</td>
-          <td data-label="Telefone">(21) 99876-5432</td>
-          <td class="editar">
-            <a href="editarProfessor.html" class="edit-btn">Editar</a>
-          </td>
-        </tr>
+        {% endfor %}
       </tbody>
     </table>
   </main>

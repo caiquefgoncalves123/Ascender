@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Editar Professor | Ascender</title>
-  <link rel="stylesheet" href="../static/style.css">
+  <link rel="stylesheet" href=  "../static/style/style.css">
 </head>
 <body>
   <!-- HEADER -->
@@ -21,15 +21,33 @@
   <div class="container">
     <div class="cadastro">
       <h2>Editar Professor</h2>
-      <form>
-        <input type="text" placeholder="Nome do professor">
-        <input type="email" placeholder="Email">
-        <input type="text" placeholder="Telefone">
-        <input type="text" placeholder="Especialidade">
-
+      <form method="POST" action="{{ url_for('editar_professor', id=professor[0]) }}">
+        <input name="nome" id="nome" type="text" value="{{ professor[1] }}" placeholder="Nome">
+        <input name="email" id="email" type="email" value="{{ professor[2] }}" placeholder="Email">
+        <input name="cpf"
+         id="cpf"
+         type="text"
+         value="{{ professor[5] }}"
+         placeholder="CPF"
+         pattern="[0-9]{11}"
+         maxlength="11"
+         inputmode="numeric"
+         oninput="this.value = this.value.replace(/\D/g, '').slice(0,11);"
+         title="Digite apenas números (11 dígitos)"
+         required>
+        <input name="telefone"
+         id="telefone"
+         type="text"
+         value="{{ professor[3] }}"
+         placeholder="Telefone (DDD + número)"
+         pattern="[0-9]{11}"
+         maxlength="11"
+         inputmode="numeric"
+         oninput="this.value = this.value.replace(/\D/g, '').slice(0,11);"
+         title="Digite apenas números (11 dígitos)"
+         required>
         <div>
-          <button type="submit" class="save-btn"> <a href="dashbord_adm.html">Salvar</a></button>
-                <a href="dashbord_adm.html" class="delete-btn">Cancelar</a>
+          <button type="submit" class="save-btn">Salvar</button>
         </div>
       </form>
     </div>

@@ -2,7 +2,7 @@
 from flask import Flask, render_template, redirect, request, flash, url_for, session, send_from_directory, send_file
 import fdb  # Biblioteca para conexão com banco de dados Firebird
 from flask_bcrypt import generate_password_hash, check_password_hash  # Criptografia de senhas
-from fpdf import FPDF  # Geração de arquivos PDF (não utilizada neste código)
+#from fpdf import FPDF  # Geração de arquivos PDF (não utilizada neste código)
 
 # Cria uma instância da aplicação Flask
 app = Flask(__name__)
@@ -10,7 +10,7 @@ app.config['SECRET_KEY'] = 'sua_chave_secreta_aqui'  # Chave usada para proteger
 
 # Configuração da conexão com o banco de dados Firebird
 host = 'localhost'
-database = r'C:\Users\Aluno\Desktop\ASCENDER.FDB'
+database = r'C:\Users\Aluno\Desktop\Ascender\ASCENDER.FDB'
 user = 'sysdba'
 password = 'sysdba'
 
@@ -98,12 +98,15 @@ def cadastro():
 
         # Se não atender aos critérios, bloqueia o cadastro
         if not (maiuscula and minuscula and numero and caracterpcd):
-            flash('A senha deve conter ao menos uma letra maiúscula, uma minúscula, um número e um caractere especial.', 'danger')
+            flash('A senha deve conter ao menos uma letra maiúscula, \numa minúscula, um número e um caractere especial.',
+                  'danger')
             return redirect(url_for('cadastro'))
 
         if len(senha) < 8 or len(senha) > 12:
             flash('A senha deve ter entre 8 e 12 caracteres.', 'danger')
             return redirect(url_for('cadastro'))
+
+
 
 
         # Criptografa a senha
@@ -342,8 +345,7 @@ def abrir_tabelamodalidade():
 
     cursor = con.cursor()
     try:
-        cursor.execute("SELECT id_modalidade, nome FROM modalidade WHERE id_modalidade = ?",
-                       (session['id_usuario'],))
+        cursor.execute("SELECT id_modalidade, nome FROM modalidade")
         modalidade= cursor.fetchall()
     finally:
         cursor.close()
@@ -366,8 +368,6 @@ def abrir_tabelaprofessores():
         cursor.close()
 
     return render_template('tabelaProfessores.html', professor=professor)
-
-
 # -------------------------------------------------------
 # CADASTRO DE Professor
 # -------------------------------------------------------
@@ -405,6 +405,73 @@ def cadastroprofessor():
             cursor.close()
 
     return render_template('cadastroProfessor.html')
+
+
+# -------------------------------------------------------
+# EDITAR PROFESSOR
+# -------------------------------------------------------
+@app.route('/editar_professor/<int:id>', methods=['GET', 'POST'])
+def editar_professor(id):
+    cursor = con.cursor()
+    cursor.execute('SELECT id_usuario, nome, email, telefone, tipo, cpf FROM usuario WHERE id_usuario = ?', (id,))
+    professor = cursor.fetchone()
+
+    if not professor:
+        cursor.close()
+        flash("Usuário não foi encontrado")
+        return redirect(url_for('cadastroprofessor'))
+
+    if request.method == 'POST':
+        nome = request.form['nome']
+        email = request.form['email']
+        cpf = request.form['cpf']
+        telefone = request.form['telefone']
+
+        # Atualiza os dados no banco
+        cursor.execute(
+            "UPDATE usuario SET nome = ?, email = ?, cpf = ?, telefone = ? WHERE id_usuario = ?",
+            (nome, email, cpf, telefone, id)
+        )
+        con.commit()
+        cursor.close()
+
+
+        # Redireciona conforme o tipo de usuário
+        if session['usuario'][5] == 0:
+            return redirect(url_for('abrir_tabelaprofessores', id=professor[0]))
+
+    return render_template('editarProfessor.html', professor=professor)
+
+
+
+# -------------------------------------------------------
+# CADASTRO DE MODALIDADE
+# -------------------------------------------------------
+@app.route('/cadastromodalidade', methods=['GET', 'POST'])
+def cadastromodalidade():
+    if 'id_usuario' not in session:
+        return redirect(url_for('login'))
+
+    if request.method == 'POST':
+        nome = request.form['nome']
+        cursor = con.cursor()
+        try:
+            cursor.execute("SELECT 1 FROM modalidade WHERE nome = ?", (nome,))
+            if cursor.fetchone():
+                flash('Essa modalidade já está cadastrada!', 'error')
+                return redirect(url_for('cadastromodalidade'))
+
+            cursor.execute(
+                "INSERT INTO modalidade (nome) VALUES (?)", (nome,))
+            con.commit()
+
+        finally:
+            cursor.close()
+            flash('Modalidade cadastrada com sucesso!', 'success')
+            return redirect(url_for('abrir_tabelamodalidade'))
+
+    return render_template('cadastroModalidade.html')
+
 
 # -------------------------------------------------------
 # EXECUÇÃO DA APLICAÇÃO

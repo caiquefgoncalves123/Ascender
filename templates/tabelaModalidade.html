@@ -24,36 +24,24 @@
   <main class="dashboard">
     <h2 class="titulo-tabela">TABELA DE MODALIDADES</h2>
 
-    <table class="tabela-aulas">
-      <thead>
-        <tr>
-          <th>TIPOS</th>
-          <TH>DESCRIÇÃO</TH>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td data-label="Modalidade">Musculação</td>
-          <td class="editar"><a href="editarModalidade.html"><button>Editar</button></a></td>
-        </tr>
-        <tr>
-          <td data-label="Modalidade">Pilates</td>
-          <td class="editar"><a href="editarModalidade.html"><button>Editar</button></a></td>
-        </tr>
-        <tr>
-          <td data-label="Modalidade">Yoga</td>
-          <td class="editar"><a href="editarModalidade.html"><button>Editar</button></a></td>
-        </tr>
-        <tr>
-          <td data-label="Modalidade">Crossfit</td>
-          <td class="editar"><a href="editarModalidade.html"><button>Editar</button></a></td>
-        </tr>
-        <tr>
-          <td data-label="Modalidade">Funcional</td>
-          <td class="editar"><a href="editarModalidade.html"><button>Editar</button></a></td>
-        </tr>
-      </tbody>
-    </table>
+ <table class="tabela-aulas">
+  <thead>
+    <tr>
+      <th>Nome</th>
+      <th>Ação</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for item in modalidade %}
+    <tr>
+      <td data-label="Nome">{{ item[1] }}</td> <!-- nome -->
+      <td class="editar">
+
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
   </main>
 
   <!-- Footer -->
