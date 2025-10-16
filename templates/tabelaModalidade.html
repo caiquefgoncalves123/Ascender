@@ -29,17 +29,27 @@
     <tr>
       <th>Nome</th>
       <th>Ação</th>
+        <th> Situação</th>
     </tr>
   </thead>
   <tbody>
-    {% for item in modalidade %}
+    {% for modalidade in modalidades %}
     <tr>
-      <td data-label="Nome">{{ item[1] }}</td> <!-- nome -->
+      <td data-label="Nome">{{ modalidade[1] }}</td> <!-- nome -->
       <td class="editar">
-
-      </td>
-    </tr>
-    {% endfor %}
+            <a href="{{ url_for('editar_modalidade', id=modalidade[0]) }}"><button>Editar</button></a>
+          </td>
+          <td class="editar"> <a href="{{ url_for('situacaoModalidade', id=modalidade[0]) }}"
+               onclick="return confirm('Deseja realmente alterar o status desta modalidade?')">
+              {% if modalidade[2] == 1 %}
+                Ativar
+              {% else %}
+                Bloquear
+              {% endif %}
+            </a>
+          </td>
+        </tr>
+        {% endfor %}
   </tbody>
 </table>
   </main>

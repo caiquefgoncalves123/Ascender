@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Editar Modalidade | Ascender</title>
-  <link rel="stylesheet" href="../static/style.css">
+  <link rel="stylesheet" href=  "../static/style/style.css">
 </head>
 <body>
   <!-- HEADER -->
@@ -21,14 +21,15 @@
   <div class="container">
     <div class="cadastro">
       <h2>Editar Modalidade</h2>
-      <form>
-        <input type="text" placeholder="Nome da modalidade">
-        <input type="text" placeholder="Descrição da modalidade">
-
+      <form method="POST" action="{{ url_for('editar_modalidade', id=modalidade[0]) }}">
+        <input name="nome" id="nome" type="text" value="{{ modalidade[1] }}" placeholder="Nome" required >
         <div>
- <button type="submit" class="save-btn"> <a href="dashbord_adm.html">Salvar</a></button>
-        <a href="dashbord_adm.html" class="delete-btn">Cancelar</a>
+      <button type="submit" class="save-btn">Salvar</button>
+
         </div>
+      </form>
+      <form action="{{ url_for('deletar', id=modalidade[0]) }}" method="post" >
+            <button type="submit">Deletar</button>
       </form>
     </div>
     <div class="text-container">

@@ -61,6 +61,7 @@ def abrir_dashbordaluno(id):
     usuario = cursor.fetchone()
     return render_template('dashboardaluno.html', usuario=usuario)
 
+
 # -------------------------------------------------------
 # CADASTRO DE USUÁRIO
 # -------------------------------------------------------
@@ -190,8 +191,6 @@ def login():
 
     return render_template('login.html')
 
-
-
 # -------------------------------------------------------
 # LOGOUT
 # -------------------------------------------------------
@@ -244,25 +243,6 @@ def editar_usuario(id):
             return redirect(url_for('abrir_dashbordaluno', id=usuario[0]))
 
     return render_template('editaraluno.html', usuario=usuario)
-
-# -------------------------------------------------------
-# LISTAR ALUNOS (VISÃO DO ADMIN)
-# -------------------------------------------------------
-@app.route('/ver_alunos')
-def ver_alunos():
-    if 'id_usuario' not in session:
-        return redirect(url_for('login'))
-
-    cursor = con.cursor()
-    try:
-        cursor.execute("SELECT id_usuario, nome, email, telefone, cpf, situacao FROM usuario WHERE tipo = 2")
-        alunos = cursor.fetchall()
-        qtd = len(alunos)
-    finally:
-        cursor.close()
-
-    return render_template('tabelaAlunos.html', alunos=alunos, qtd=qtd)
-
 # -------------------------------------------------------
 # ATIVAR / BLOQUEAR USUÁRIO
 # -------------------------------------------------------
@@ -297,7 +277,29 @@ def situacao(id):
     return redirect(url_for('ver_alunos'))
 
 # -------------------------------------------------------
-# Inscreva-se
+# LISTAR USUÁRIOS (VISÃO DO ADMIN)
+# -------------------------------------------------------
+@app.route('/ver_alunos')
+def ver_alunos():
+    if 'id_usuario' not in session:
+        return redirect(url_for('login'))
+
+    cursor = con.cursor()
+    try:
+        cursor.execute("SELECT id_usuario, nome, email, telefone, cpf, situacao FROM usuario WHERE tipo = 2")
+        alunos = cursor.fetchall()
+        qtd = len(alunos)
+    finally:
+        cursor.close()
+
+    return render_template('tabelaAlunos.html', alunos=alunos, qtd=qtd)
+
+
+
+
+
+# -------------------------------------------------------
+# ABRIR TABELA AULAS - inscreva-se
 # -------------------------------------------------------
 @app.route('/abrir_tabelaaulas')
 def abrir_tabelaaulas():
@@ -314,10 +316,41 @@ def abrir_tabelaaulas():
 
     return render_template('tabelaAulas.html', aulas=aulas)
 
+# -------------------------------------------------------
+# ATIVAR / BLOQUEAR AULA
+# -------------------------------------------------------
+@app.route('/situacaoModalidade/<int:id>')
+def situacaoModalidade(id):
+    # Verifica se o usuário está logado
+    if 'id_usuario' not in session:
+        return redirect(url_for('login'))
 
+    cursor = con.cursor()
+    try:
+        # Busca a situação atual do usuário (1 = ativo, 0 = bloqueado)
+        cursor.execute("SELECT situacao FROM modalidade WHERE id_modalidade = ?", (id,))
+        resultado = cursor.fetchone()
+
+        if resultado:
+            status_atual = resultado[0]
+
+            # Troca o status: se estiver ativo, bloqueia; se estiver bloqueado, ativa
+            if status_atual == 1:
+                novo_status = 0
+            else:
+                novo_status = 1
+
+            # Atualiza no banco
+            cursor.execute("UPDATE modalidade SET situacao = ? WHERE id_modalidade = ?", (novo_status, id))
+            con.commit()
+
+    finally:
+        cursor.close()
+
+    return redirect(url_for('abrir_tabelamodalidade'))
 
 # -------------------------------------------------------
-# Tabela Aula Adm
+# ABRIR TABELA AULA ADM
 # -------------------------------------------------------
 @app.route('/abrir_tabelaaulasadm')
 def abrir_tabelaaulasadm():
@@ -335,25 +368,11 @@ def abrir_tabelaaulasadm():
     return render_template('tabelaAulaAdm.html', aulas=aulas)
 
 
-# -------------------------------------------------------
-# Tabela Modalidade
-# -------------------------------------------------------
-@app.route('/abrir_tabelamodalidade')
-def abrir_tabelamodalidade():
-    if 'id_usuario' not in session:
-        return redirect(url_for('login'))
 
-    cursor = con.cursor()
-    try:
-        cursor.execute("SELECT id_modalidade, nome FROM modalidade")
-        modalidade= cursor.fetchall()
-    finally:
-        cursor.close()
 
-    return render_template('tabelaModalidade.html', modalidade=modalidade)
 
 # -------------------------------------------------------
-# Tabela professores
+# ABRIR TABELA PROFESSOR
 # -------------------------------------------------------
 @app.route('/abrir_tabelaprofessores')
 def abrir_tabelaprofessores():
@@ -368,8 +387,9 @@ def abrir_tabelaprofessores():
         cursor.close()
 
     return render_template('tabelaProfessores.html', professor=professor)
+
 # -------------------------------------------------------
-# CADASTRO DE Professor
+# CADASTRAR PROFESSOR
 # -------------------------------------------------------
 @app.route('/cadastroprofessor', methods=['GET', 'POST'])
 def cadastroprofessor():
@@ -398,11 +418,15 @@ def cadastroprofessor():
             )
             con.commit()
             usuario = session['id_usuario']
-            flash('Professor cadastrado com sucesso!', 'success')
-            return render_template('dashbord_adm.html', usuario=usuario)
+
 
         finally:
+
             cursor.close()
+
+            flash('Professor cadastrada com sucesso!', 'success')
+
+            return redirect(url_for('abrir_tabelaprofessores'))
 
     return render_template('cadastroProfessor.html')
 
@@ -444,6 +468,25 @@ def editar_professor(id):
 
 
 
+
+# -------------------------------------------------------
+# ABRIR TABELA Modalidade
+# -------------------------------------------------------
+@app.route('/abrir_tabelamodalidade')
+def abrir_tabelamodalidade():
+    if 'id_usuario' not in session:
+        return redirect(url_for('login'))
+
+    cursor = con.cursor()
+    try:
+        cursor.execute("SELECT id_modalidade, nome, situacao FROM modalidade")
+        modalidades= cursor.fetchall()
+    finally:
+        cursor.close()
+
+    return render_template('tabelaModalidade.html', modalidades=modalidades)
+
+
 # -------------------------------------------------------
 # CADASTRO DE MODALIDADE
 # -------------------------------------------------------
@@ -471,6 +514,63 @@ def cadastromodalidade():
             return redirect(url_for('abrir_tabelamodalidade'))
 
     return render_template('cadastroModalidade.html')
+
+# -------------------------------------------------------
+# EDITAR MODALIDADE
+# -------------------------------------------------------
+@app.route('/editar_modalidade/<int:id>', methods=['GET', 'POST'])
+def editar_modalidade(id):
+    cursor = con.cursor()
+    cursor.execute('SELECT id_modalidade, nome FROM modalidade', (id,))
+    modalidade = cursor.fetchone()
+
+    if not modalidade:
+        cursor.close()
+        flash("Modalidade não foi encontrado")
+        return redirect(url_for('cadastromodalidade'))
+
+    if request.method == 'POST':
+        nome = request.form['nome']
+
+        # Atualiza os dados no banco
+        cursor.execute(
+            "UPDATE modalidade SET nome = ? where id_modalidade = ?",
+            (nome, id)
+        )
+        con.commit()
+        cursor.close()
+
+
+        # Redireciona conforme o tipo de usuário
+        if session['usuario'][5] == 0:
+            return redirect(url_for('abrir_tabelamodalidade'))
+
+    return render_template('editarModalidade.html', modalidade=modalidade)
+
+
+# -------------------------------------------------------
+# DELETAR MODALIDADE
+# -------------------------------------------------------
+@app.route('/deletar/<int:id>', methods=('POST',))
+def deletar(id):
+    # Verifica se o usuário está logado
+    if 'id_usuario' not in session:
+        return redirect(url_for('login'))
+
+
+    cursor = con.cursor()
+    try:
+        cursor.execute('DELETE FROM modalidade WHERE id_modalidade = ?', (id,))
+        con.commit()
+        flash('Modalidade excluída com sucesso!', 'success')
+    except Exception as e:
+        con.rollback()
+        flash('Erro ao excluir o livro.', 'error')
+    finally:
+        cursor.close()
+
+    return redirect(url_for('abrir_tabelamodalidade'))
+
 
 
 # -------------------------------------------------------
