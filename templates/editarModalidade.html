@@ -24,13 +24,16 @@
       <form method="POST" action="{{ url_for('editar_modalidade', id=modalidade[0]) }}">
         <input name="nome" id="nome" type="text" value="{{ modalidade[1] }}" placeholder="Nome" required >
         <div>
-      <button type="submit" class="save-btn">Salvar</button>
+
 
         </div>
       </form>
-      <form action="{{ url_for('deletar', id=modalidade[0]) }}" method="post" >
-            <button type="submit">Deletar</button>
+      <div>
+          <button type="submit" class="save-btn">Salvar</button>
+         <form action="{{ url_for('deletar', id=modalidade[0]) }}" method="post" >
+            <a href="dashbord_adm.html" class="delete-btn">Deletar</a>
       </form>
+      </div>
     </div>
     <div class="text-container">
       <p>Altere os detalhes da modalidade oferecida pela academia.</p>

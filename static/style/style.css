@@ -123,16 +123,18 @@ main {
 
 /* Específico para main.dashboard */
 main.dashboard {
-  flex: 1;
-  /* Empurra o footer para baixo */
-  padding: 40px 20px;
-  max-width: 1200px;
-  margin: 0 auto;
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0;
+    flex: 1;
+    padding: 40px 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+    margin-top: 100px;
+    position: fixed;
+    display: contents;
 }
 
 .container {
@@ -375,9 +377,10 @@ button:hover,
 }
 
 .dashboard h1 {
-  color: #000;
-  font-size: 28px;
-  margin-top: 220px;
+    color: #000;
+    font-size: 28px;
+    margin-top: 220px;
+    align-self: center;
 }
 
 .dashboard section .caixa {
@@ -415,9 +418,10 @@ button:hover,
 }
 
 .admcaixa {
-  display: block;
-  flex-wrap: nowrap;
-  width: 1000px;
+    display: block;
+    flex-wrap: nowrap;
+    width: 1000px;
+    align-self: center;
 }
 
 .relatorio {
@@ -473,6 +477,7 @@ button:hover,
   display: flex;
   justify-content: flex-end;
   gap: 10px;
+  align-self: center;
 }
 
 /* Table (listagem) */
@@ -485,14 +490,14 @@ button:hover,
 }
 
 .tabela-aulas {
-  width: 100%;
-  max-width: 800px;
-  /* Limita a largura da tabela */
-  border-collapse: collapse;
-  border-radius: 8px;
-  overflow: hidden;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  background-color: var(--branco);
+    width: 100%;
+    max-width: 800px;
+    border-collapse: collapse;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    background-color: var(--branco);
+    align-self: center;
 }
 
 .tabela-aulas th,
@@ -1126,6 +1131,7 @@ button:hover,
     display: block;
     overflow: scroll;
     margin-bottom: -70px;
+    position: inherit;
   }
 }
 
@@ -1383,4 +1389,73 @@ button:hover,
 
 .alert{
   white-space: pre-line;
+}
+/* ===== Estilo das mensagens flash (verde militar com botão de fechar) ===== */
+
+.flash-messages {
+    max-width: 700px;
+    margin: 20px auto;
+    padding: 0;
+    list-style: none;
+    font-family: 'Poppins', sans-serif;
+    animation: fadeIn 0.5s ease;
+    margin-right: 25px;
+}
+
+.flash {
+  position: relative;
+  padding: 14px 40px 14px 20px;
+  border-radius: 12px;
+  margin-bottom: 12px;
+  font-size: 15px;
+  font-weight: 500;
+  text-align: center;
+  color: #f4f4f4;
+  background: linear-gradient(135deg, #3e4d42, #5b6f5a);
+  box-shadow: 0 4px 8px rgba(50, 60, 45, 0.4);
+  transition: transform 0.2s ease, opacity 0.3s ease;
+}
+
+.flash:hover {
+  transform: scale(1.02);
+}
+
+/* Botão "X" de fechar */
+.close-btn {
+  position: absolute;
+  top: 8px;
+  right: 12px;
+  color: #f4f4f4;
+  font-size: 20px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.close-btn:hover {
+  color: #c1d3b0; /* tom de verde mais claro */
+}
+
+/* Animação suave */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ===== Variações de cor ===== */
+.flash.success {
+  background: linear-gradient(135deg, #4b6043, #6b8e4e);
+}
+
+.flash.error {
+  background: linear-gradient(135deg, #5b4b4b, #9a7b7b);
+}
+
+.flash.info {
+  background: linear-gradient(135deg, #5a6652, #8a9b84);
+}
+
+.flash.warning {
+  background: linear-gradient(135deg, #7d8b72, #a6b39b);
+  color: #222;
 }

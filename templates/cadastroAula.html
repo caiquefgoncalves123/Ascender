@@ -26,16 +26,33 @@
           <h2>Cadastre uma <br> aula</h2>
         </div>
         <div class="cadastro-aula">
-          <form class="caform">
-            <input class="cainput" type="text" placeholder="Professor" required>
-            <input type="text" placeholder="Insira o horário" required>
-            <input type="text" placeholder="Insira a modalidade" required>
-            <input type="text" placeholder="Capacidade" required>
+          <form class="caform" method="POST" action="/cadastroaula">
+
+            <select class="cainput" name="id_usuario" required>
+                <option value="" disabled selected>Escolha o professor</option>
+                {% for p in professores %}
+                    <option value="{{ p[0] }}">{{ p[1] }}</option>
+                {% endfor %}
+            </select>
+            <input type="hora" name="hora" placeholder="Insira o horário de início" required>
+            <input type="text" name="hora_fim" placeholder="Insira o horário de término" required>
+            <input type="text" name="id_modalidade" placeholder="Insira a modalidade" required>
+
+            <input type="text" name="capacidade" placeholder="Capacidade" required>
+
+            <!-- Dias da semana -->
+              <label><input type="checkbox" name="segunda" value="1"> Segunda</label>
+              <label><input type="checkbox" name="terca" value="1"> Terça</label>
+              <label><input type="checkbox" name="quarta" value="1"> Quarta</label>
+              <label><input type="checkbox" name="quinta" value="1"> Quinta</label>
+              <label><input type="checkbox" name="sexta" value="1"> Sexta</label>
+              <label><input type="checkbox" name="sabado" value="1"> Sábado</label>
+
             <div>
-          <button type="submit" class="save-btn"><a href="tabelaAulaAdm.html">Salvar</a></button>
-          <a href="dashbord_adm.html" class="delete-btn">Cancelar</a>
-        </div>          
-      </form>
+                <button type="submit" class="save-btn">Salvar</button>
+                <a href="dashbord_adm.html" class="delete-btn">Cancelar</a>
+            </div>
+        </form>
         </div>
       </section>
       <section class="p">

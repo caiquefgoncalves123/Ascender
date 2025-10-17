@@ -19,8 +19,19 @@
     <a href="home.html">Sobre</a>
   </nav>
 </header>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="flash-messages">
+                    {% for category, message in messages %}
+    <div class="flash {{ category }}">
+        <span class="close-btn" onclick="this.parentElement.style.display='none';">&times;</span>
+        {{ message }}
+    </div>
+{% endfor %}
 
-
+                </div>
+            {% endif %}
+        {% endwith %}
     <div class="container">
         <div class="form-container">
             <h2 class="moda2">Cadastre a modalidade</h2>
@@ -31,16 +42,6 @@
                     <a href="dashbord_adm.html" class="delete-btn">Cancelar</a>
                 </div>
             </form>
-
-                     {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                <div class="flash-messages">
-                    {% for category, message in messages %}
-                        <div class="flash {{ category }}">{{ message }}</div>
-                    {% endfor %}
-                </div>
-            {% endif %}
-        {% endwith %}
         </div>
         <div class="text-container">
             <p>Use e abuse de todas as nossas modalidades!</p>
