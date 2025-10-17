@@ -1,24 +1,38 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Painel - Tabela de Aulas</title>
-  <link rel="stylesheet" href=  "../static/style/style.css">
+  <link rel="stylesheet" href="../static/style/style.css" />
   <!-- Google Fonts -->
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&family=Poppins:wght@500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&family=Poppins:wght@500;600;700&display=swap" rel="stylesheet" />
 </head>
 <body>
   <!-- Header -->
   <header>
     <div class="logo">
-      <img src="../static/img/logo-ascender.jpg" alt="Ascender Logo">
+      <img src="../static/img/logo-ascender.jpg" alt="Ascender Logo" />
     </div>
     <nav>
       <a href="{{ url_for('index') }}">Sobre</a>
       <a href="{{ url_for('abrir_dashbordadm', id=session['id_usuario']) }}">Voltar</a>
     </nav>
   </header>
+
+  <!-- Mensagens flash -->
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      <div class="flash-messages">
+        {% for category, message in messages %}
+          <div class="flash {{ category }}">
+            <span class="close-btn" onclick="this.parentElement.style.display='none';"></span>
+            {{ message }}
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+  {% endwith %}
 
   <!-- Conteúdo -->
   <main class="dashboard">
@@ -28,25 +42,30 @@
       <thead>
         <tr>
           <th>Modalidade</th>
-          <th>Horário</th>
           <th>Professor</th>
           <th>Dia</th>
-          <th></th>
+          <th>Horário início</th>
+          <th>Horário fim</th>
+          <th>Capacidade</th>
+<!--          <th>Ações</th>-->
         </tr>
       </thead>
       <tbody>
+        {% for aula in aulas %}
         <tr>
-          <td data-label="Modalidade">Musculação</td>
-          <td data-label="Horário">08:00</td>
-          <td data-label="Professor">João Silva</td>
-          <td data-label="Dia">Seg - Ter</td>
-          <td class="editar"><a href="editarAula.html"><button>Editar</button></a></td>
+          <td data-label="Modalidade">{{ aula[2] }}</td>
+          <td data-label="Professor">{{ aula[1] }}</td>
+          <td data-label="Dia">{{ aula[] }}</td>
+          <td data-label="Horário início">{{ aula[4] }} </td>
+          <td data-label="Horário fim">{{ aula[5] }}</td>
+          <td data-label="Capacidade">{{ aula[3] }}</td>
         </tr>
+        {% endfor %}
       </tbody>
     </table>
   </main>
-</body> 
- <!-- Footer -->
+
+  <!-- Footer -->
   <footer class="rodape">
     <div class="conteudo-rodape">
       <div class="coluna-esquerda">
@@ -61,4 +80,5 @@
       </div>
     </div>
   </footer>
+</body>
 </html>
