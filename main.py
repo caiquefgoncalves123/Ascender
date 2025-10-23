@@ -737,8 +737,6 @@ def editar_modalidade(id):
         # Redireciona conforme o tipo de usuário
         if session['usuario'][5] == 0:
             return redirect(url_for('abrir_tabelamodalidade'))
-        else:
-            return redirect(url_for('outra_rota_que_vc_quiser'))  # opcional
 
     return render_template('editarModalidade.html', modalidade=modalidade)
 
@@ -759,7 +757,7 @@ def deletar(id):
         flash('Modalidade excluída com sucesso!', 'success')
     except Exception as e:
         con.rollback()
-        flash('Erro ao excluir o modalidade.', 'error')
+        flash('Modalidade vinculada a uma aula.', 'error')
     finally:
         cursor.close()
 

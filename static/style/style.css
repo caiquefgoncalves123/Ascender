@@ -535,7 +535,7 @@ button:hover,
 }
 
 .tabela-aulas .editar {
-  text-align: right;
+  text-align: left;
 }
 
 .tabela-aulas .btn-editar,
@@ -549,6 +549,15 @@ button:hover,
   font-weight: 500;
   transition: background-color 0.3s ease;
 }
+
+.select{
+  padding: 12px;
+  border: none;
+  border-radius: 20px;
+  background-color: var(--cinza-300);
+  outline: none;
+  font-size: 18px;
+}}
 
 .tabela-aulas .btn-editar:hover,
 .tabela-aulas .edit-btn:hover {
