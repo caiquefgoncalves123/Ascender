@@ -68,16 +68,20 @@ def abrir_dashbordaluno(id):
 def cadastro():
     if request.method == 'POST':
         # Coleta dados do formulário
-        nome = request.form['nome']
-        email = request.form['email']
-        cpf = request.form['cpf']
-        telefone = request.form['telefone']
+        nome = request.form['nome'].strip()
+        email = request.form['email'].strip()
+        cpf = request.form['cpf'].strip()
+        telefone = request.form['telefone'].strip()
         senha = request.form['senha']
         confirma = request.form['confirma']
 
         # Verifica se as senhas coincidem
         if senha != confirma:
             flash("Senhas não coincidem!")
+            return redirect(url_for('cadastro'))
+
+        if not nome:
+            flash("O nome não pode estar vazio.", "error")
             return redirect(url_for('cadastro'))
 
         # Verifica o tamanho da senha
@@ -200,9 +204,6 @@ def logout():
     session.pop("usuario", None)# Remove o ID do usuário da sessão
     return redirect(url_for('index'))
 
-# -------------------------------------------------------
-# EDITAR USUÁRIO
-# -------------------------------------------------------
 @app.route('/editar_usuario/<int:id>', methods=['GET', 'POST'])
 def editar_usuario(id):
     cursor = con.cursor()
@@ -221,36 +222,42 @@ def editar_usuario(id):
         cpf = request.form['cpf']
         telefone = request.form['telefone']
 
+        # Verifica se o email já existe
+        cursor.execute("SELECT 1 FROM usuario WHERE email = ? AND id_usuario != ?", (email, id))
+        if cursor.fetchone():
+            flash('Esse e-mail já está cadastrado!', 'error')
+            return redirect(url_for('editar_usuario', id=id))
 
-
-        maiuscula = minuscula = numero = caracterpcd = False
-
-        for s in senha:
-            if s.isupper():
-                maiuscula = True
-            if s.islower():
-                minuscula = True
-            if s.isdigit():
-                numero = True
-            if not s.isalnum():
-                caracterpcd = True
-
-        # Se não atender aos critérios, bloqueia o cadastro
-        if not (maiuscula and minuscula and numero and caracterpcd):
-            flash('A senha deve conter ao menos uma letra maiúscula, \numa minúscula, um número e um caractere especial.',
-                  'danger')
-            return redirect(url_for('ver_alunos'))
-
-        # Verifica o tamanho da senha
-        if len(senha) < 8 or len(senha) > 12:
-            flash('A senha deve ter entre 8 e 12 caracteres.', 'danger')
-            return redirect(url_for('ver_alunos/<int:id>'))
-
-        # Se o campo senha for preenchido, criptografa a nova senha
+        # Validação da senha (se for preenchida)
         if senha:
+            maiuscula = minuscula = numero = caracterpcd = False
+
+            for s in senha:
+                if s.isupper():
+                    maiuscula = True
+                if s.islower():
+                    minuscula = True
+                if s.isdigit():
+                    numero = True
+                if not s.isalnum():
+                    caracterpcd = True
+
+            # Se não atender aos critérios, bloqueia o cadastro
+            if not (maiuscula and minuscula and numero and caracterpcd):
+                flash(
+                    'A senha deve conter ao menos uma letra maiúscula, \numa minúscula, um número e um caractere especial.',
+                    'danger')
+                return redirect(url_for('editar_usuario', id=id))
+
+            # Verifica o tamanho da senha
+            if len(senha) < 8 or len(senha) > 12:
+                flash('A senha deve ter entre 8 e 12 caracteres.', 'danger')
+                return redirect(url_for('editar_usuario', id=id))
+
+            # Criptografa a nova senha
             senha_cripto = generate_password_hash(senha).decode('utf-8')
         else:
-            senha_cripto = usuario[3]  # Mantém a senha antiga
+            senha_cripto = usuario[3]  # Mantém a senha antiga se não for fornecida uma nova
 
         # Atualiza os dados no banco
         cursor.execute(
@@ -260,7 +267,6 @@ def editar_usuario(id):
         con.commit()
         cursor.close()
 
-
         # Redireciona conforme o tipo de usuário
         if session['usuario'][5] == 0:
             return redirect(url_for('ver_alunos', id=usuario[0]))
@@ -268,6 +274,7 @@ def editar_usuario(id):
             return redirect(url_for('abrir_dashbordaluno', id=usuario[0]))
 
     return render_template('editaraluno.html', usuario=usuario)
+
 # -------------------------------------------------------
 # ATIVAR / BLOQUEAR USUÁRIO
 # -------------------------------------------------------
@@ -557,40 +564,39 @@ def abrir_tabelaprofessores():
 # -------------------------------------------------------
 @app.route('/cadastroprofessor', methods=['GET', 'POST'])
 def cadastroprofessor():
-    print()
     if 'id_usuario' not in session:
         return redirect(url_for('login'))
 
     if request.method == 'POST':
-        # Coleta dados do formulário
-        nome = request.form['nome']
-        email = request.form['email']
-        cpf = request.form['cpf']
-        telefone = request.form['telefone']
+        nome = request.form['nome'].strip()
+        email = request.form['email'].strip()
+        cpf = request.form['cpf'].strip()
+        telefone = request.form['telefone'].strip()
         cursor = con.cursor()
-        try:  # tratamento de erro
+        try:
             # Verifica se o e-mail já está cadastrado
             cursor.execute("SELECT 1 FROM usuario WHERE email = ?", (email,))
-            if cursor.fetchone():  # Verifica se a consulta retornou algum resultado
+            if cursor.fetchone():
                 flash('Esse e-mail já está cadastrado!', 'error')
                 return redirect(url_for('cadastroprofessor'))
 
-            # Insere novo usuário (tipo = 2 → aluno)
+            # Verifica nome vazio
+            if not nome:
+                flash("O nome não pode estar vazio.", "error")
+                return redirect(url_for('cadastroprofessor'))
+
+            # Insere novo professor
             cursor.execute(
                 "INSERT INTO usuario (tipo, nome, email, cpf, telefone) VALUES (?, ?, ?, ?, ?)",
                 (1, nome, email, cpf, telefone)
             )
             con.commit()
-            usuario = session['id_usuario']
 
+            flash('Professor cadastrado com sucesso!', 'success')
+            return redirect(url_for('abrir_tabelaprofessores'))
 
         finally:
-
             cursor.close()
-
-            flash('Professor cadastrada com sucesso!', 'success')
-
-            return redirect(url_for('abrir_tabelaprofessores'))
 
     return render_template('cadastroProfessor.html')
 
@@ -614,6 +620,12 @@ def editar_professor(id):
         email = request.form['email']
         cpf = request.form['cpf']
         telefone = request.form['telefone']
+
+        # Verifica se o email já existe
+        cursor.execute("SELECT 1 FROM usuario WHERE email = ? AND id_usuario != ?", (email, id))
+        if cursor.fetchone():
+            flash('Esse e-mail já está cadastrado!', 'error')
+            return redirect(url_for('editar_professor', id=id))
 
         # Atualiza os dados no banco
         cursor.execute(
@@ -687,36 +699,48 @@ def cadastromodalidade():
 @app.route('/editar_modalidade/<int:id>', methods=['GET', 'POST'])
 def editar_modalidade(id):
     cursor = con.cursor()
-    cursor.execute('SELECT id_modalidade, nome FROM modalidade where id_modalidade = ?', (id,))
-    modalidade = cursor.fetchone()
 
-    print(modalidade)
+    # Buscar a modalidade que será editada
+    cursor.execute('SELECT id_modalidade, nome FROM modalidade WHERE id_modalidade = ?', (id,))
+    modalidade = cursor.fetchone()
 
     if not modalidade:
         cursor.close()
-        flash("Modalidade não foi encontrado")
+        flash("Modalidade não foi encontrada", "error")
         return redirect(url_for('cadastromodalidade'))
 
     if request.method == 'POST':
         nome = request.form['nome']
 
+        # Verifica se já existe outra modalidade com o mesmo nome
+        cursor.execute(
+            'SELECT id_modalidade FROM modalidade WHERE nome = ? AND id_modalidade != ?',
+            (nome, id)
+        )
+        existente = cursor.fetchone()
+
+        if existente:
+            flash('Essa modalidade já está cadastrada!', 'error')
+            cursor.close()
+            return redirect(url_for('editar_modalidade', id=id))
+
         # Atualiza os dados no banco
         cursor.execute(
-            "UPDATE modalidade SET nome = ? where id_modalidade = ?",
+            'UPDATE modalidade SET nome = ? WHERE id_modalidade = ?',
             (nome, id)
         )
         con.commit()
         cursor.close()
-        print(nome)
-        print(id)
 
+        flash('Modalidade atualizada com sucesso!', 'success')
 
         # Redireciona conforme o tipo de usuário
         if session['usuario'][5] == 0:
             return redirect(url_for('abrir_tabelamodalidade'))
+        else:
+            return redirect(url_for('outra_rota_que_vc_quiser'))  # opcional
 
     return render_template('editarModalidade.html', modalidade=modalidade)
-
 
 # -------------------------------------------------------
 # DELETAR MODALIDADE
