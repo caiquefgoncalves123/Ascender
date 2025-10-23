@@ -221,6 +221,31 @@ def editar_usuario(id):
         cpf = request.form['cpf']
         telefone = request.form['telefone']
 
+
+
+        maiuscula = minuscula = numero = caracterpcd = False
+
+        for s in senha:
+            if s.isupper():
+                maiuscula = True
+            if s.islower():
+                minuscula = True
+            if s.isdigit():
+                numero = True
+            if not s.isalnum():
+                caracterpcd = True
+
+        # Se não atender aos critérios, bloqueia o cadastro
+        if not (maiuscula and minuscula and numero and caracterpcd):
+            flash('A senha deve conter ao menos uma letra maiúscula, \numa minúscula, um número e um caractere especial.',
+                  'danger')
+            return redirect(url_for('ver_alunos'))
+
+        # Verifica o tamanho da senha
+        if len(senha) < 8 or len(senha) > 12:
+            flash('A senha deve ter entre 8 e 12 caracteres.', 'danger')
+            return redirect(url_for('ver_alunos/<int:id>'))
+
         # Se o campo senha for preenchido, criptografa a nova senha
         if senha:
             senha_cripto = generate_password_hash(senha).decode('utf-8')
@@ -359,13 +384,47 @@ def abrir_tabelaaulasadm():
 
     cursor = con.cursor()
     try:
-        cursor.execute("""
-                            SELECT 
-                                a.id_aulas, u.nome AS professor, m.nome AS modalidade,
-                                a.capacidade, a.hora, a.hora_fim, a.segunda, a.terca, a.quarta, a.quinta, a.sexta, a.sabado
+        cursor.execute("""SELECT a.id_aulas
+                                  , u.nome AS professor
+                                  , m.nome AS modalidade
+                                  , a.capacidade
+                                  , a.hora
+                                  , a.hora_fim
+                                  
+                                 , CASE a.segunda
+                                     WHEN 1 THEN 'Seg '
+                                    ELSE '' 
+                                    END  ||
+                                    
+                                       CASE a.terca
+                                     WHEN 1 THEN 'Ter '
+                                    ELSE '' 
+                                    END ||
+                                    
+                                              CASE a.quarta
+                                     WHEN 1 THEN 'Qua '
+                                    ELSE '' 
+                                    END ||  
+                                    
+                                   CASE a.quinta
+                                     WHEN 1 THEN 'Qui '
+                                    ELSE '' 
+                                    END ||
+                                    
+                                       CASE a.sexta
+                                     WHEN 1 THEN 'Sex '
+                                    ELSE '' 
+                                    END ||
+                                
+                                    
+                                   CASE a.sabado
+                                     WHEN 1 THEN 'Sab '
+                                    ELSE '' 
+                                    END AS dias_semana
+                                     
                             FROM aulas a
-                            JOIN usuario u ON a.id_usuario = u.id_usuario
-                            JOIN modalidade m ON a.id_modalidade = m.id_modalidade
+                            INNER JOIN usuario u ON a.id_usuario = u.id_usuario
+                            INNER JOIN modalidade m ON a.id_modalidade = m.id_modalidade
                         """)
         aulas = cursor.fetchall()
     finally:
@@ -393,8 +452,10 @@ def cadastroaula():
         professores = cursor.fetchall()
         print(professores)
 
-        cursor.execute("SELECT id_modalidade, nome FROM modalidade")
+        cursor.execute("SELECT id_modalidade, nome FROM modalidade where coalesce(situacao, 0) = 0")
         modalidades = cursor.fetchall()
+
+
 
         if request.method == 'POST':
 
@@ -422,10 +483,18 @@ def cadastroaula():
             hora_fim = request.form['hora_fim']
             capacidade = request.form['capacidade']
 
+            if hora > hora_fim:
+                flash("O horário do fim precisa ser maior que o de início!")
+                return redirect(url_for('cadastroaula'))
 
-             # if hora < hora_fim:
-             #     flash("O horário do fim precisa ser maior que o de início!")
-             #     return redirect(url_for('cadastroaula'))
+
+            if capacidade <= '0':
+                flash("A capacidade precisa ser maior que 0!")
+                return redirect(url_for('cadastroaula'))
+
+
+
+
 
             # Verifica se a aula já está cadastrado
             cursor.execute("""SELECT 1 FROM AULAS  
@@ -598,6 +667,8 @@ def cadastromodalidade():
             if cursor.fetchone():
                 flash('Essa modalidade já está cadastrada!', 'error')
                 return redirect(url_for('cadastromodalidade'))
+            else:
+                flash('Modalidade cadastrada com sucesso!', 'success')
 
             cursor.execute(
                 "INSERT INTO modalidade (nome) VALUES (?)", (nome,))
@@ -616,8 +687,10 @@ def cadastromodalidade():
 @app.route('/editar_modalidade/<int:id>', methods=['GET', 'POST'])
 def editar_modalidade(id):
     cursor = con.cursor()
-    cursor.execute('SELECT id_modalidade, nome FROM modalidade', (id,))
+    cursor.execute('SELECT id_modalidade, nome FROM modalidade where id_modalidade = ?', (id,))
     modalidade = cursor.fetchone()
+
+    print(modalidade)
 
     if not modalidade:
         cursor.close()
@@ -634,6 +707,8 @@ def editar_modalidade(id):
         )
         con.commit()
         cursor.close()
+        print(nome)
+        print(id)
 
 
         # Redireciona conforme o tipo de usuário

@@ -16,7 +16,8 @@
   </div>
 
   <nav>
-    <a href="home.html">Sobre</a>
+          <a href="{{ url_for('index') }}">Sobre</a>
+      <a href="{{ url_for('abrir_dashbordadm', id=session['id_usuario']) }}">Voltar</a>
   </nav>
 </header>
     {% with messages = get_flashed_messages(with_categories=true) %}
@@ -39,7 +40,6 @@
                 <input type="text" id="nome" name="nome" placeholder="Digite o nome da modalidade">
                 <div>
                     <button type="submit" class="save-btn">Salvar</button>
-                    <a href="dashbord_adm.html" class="delete-btn">Cancelar</a>
                 </div>
             </form>
         </div>

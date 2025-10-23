@@ -53,7 +53,7 @@
       <td class="editar">
             <a href="{{ url_for('editar_modalidade', id=modalidade[0]) }}"><button>Editar</button></a>
           </td>
-          <td class="editar"> <a href="{{ url_for('situacaoModalidade', id=modalidade[0]) }}"
+          <td class="editar"><a href="{{ url_for('situacaoModalidade', id=modalidade[0]) }}"
                onclick="return confirm('Deseja realmente alterar o status desta modalidade?')">
               {% if modalidade[2] == 1 %}
                 Ativar

@@ -13,7 +13,8 @@
       <img src="../static/img/logo-ascender.jpg" alt="Logo Ascender">
     </div>
     <nav>
-      <a href="home.html">Sobre</a>
+      <a href="{{ url_for('index') }}">Sobre</a>
+      <a href="{{ url_for('abrir_tabelaprofessores', id=session['id_usuario']) }}">Voltar</a>
     </nav>
   </header>
 

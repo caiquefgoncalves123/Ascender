@@ -15,7 +15,8 @@
         <img src="../static/img/logo-ascender.jpg" alt="Ascender Logo">
     </div>
     <nav>
-      <a href="home.html">Sobre</a>
+        <a href="{{ url_for('index') }}">Sobre</a>
+      <a href="{{ url_for('abrir_dashbordadm', id=session['id_usuario']) }}">Voltar</a>
     </nav>
   </header>
 
@@ -26,7 +27,8 @@
           <h2>Cadastre uma <br> aula</h2>
         </div>
         <div class="cadastro-aula">
-          <form class="caform" method="POST" action="/cadastroaula">
+            <div class="aula-coisas">
+                 <form class="caform" method="POST" action="/cadastroaula">
 
             <select class="cainput" name="id_usuario" id="id_usuario" required>
                 <option value="" disabled selected>Escolha o professor</option>
@@ -44,21 +46,22 @@
             <input type="time" name="hora" placeholder="Insira o horário de início" required>
             <input type="time" name="hora_fim" placeholder="Insira o horário de término" required>
             <input type="number" name="capacidade" placeholder="Capacidade" required>
+            </div>
 
             <!-- Dias da semana -->
 
-
-             <label><input type="checkbox" name="segunda" value="1"> Segunda</label>
+              <div class="aula-dias">
+                   <label><input type="checkbox" name="segunda" value="1"> Segunda</label>
              <label><input type="checkbox" name="terca" value="1"> Terça</label>
               <label><input type="checkbox" name="quarta" value="1"> Quarta</label>
              <label><input type="checkbox" name="quinta" value="1"> Quinta</label>
               <label><input type="checkbox" name="sexta" value="1"> Sexta</label>
              <label><input type="checkbox" name="sabado" value="1"> Sábado</label>
+              </div>
 
 
-            <div>
+            <div class="btn">
                 <button type="submit" class="save-btn">Salvar</button>
-                <a href="dashbord_adm.html" class="delete-btn">Cancelar</a>
             </div>
         </form>
         </div>

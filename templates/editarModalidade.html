@@ -13,7 +13,8 @@
       <img src="../static/img/logo-ascender.jpg" alt="Logo Ascender">
     </div>
     <nav>
-      <a href="home.html">Sobre</a>
+      <a href="{{ url_for('index') }}">Sobre</a>
+      <a href="{{ url_for('abrir_tabelamodalidade', id=session['id_usuario']) }}">Voltar</a>
     </nav>
   </header>
 
@@ -25,14 +26,15 @@
         <input name="nome" id="nome" type="text" value="{{ modalidade[1] }}" placeholder="Nome" required >
         <div>
 
-
+          <button type="submit" class="save-btn">Salvar</button>
         </div>
+
       </form>
       <div>
-          <button type="submit" class="save-btn">Salvar</button>
+
          <form action="{{ url_for('deletar', id=modalidade[0]) }}" method="post" >
-            <a href="dashbord_adm.html" class="delete-btn">Deletar</a>
-      </form>
+            <button type="submit" class="delete-btn">Deletar</button>
+         </form>
       </div>
     </div>
     <div class="text-container">

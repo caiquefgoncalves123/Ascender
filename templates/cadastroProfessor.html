@@ -16,7 +16,8 @@
   </div>
 
   <nav>
-    <a href="home.html">Sobre</a>
+      <a href="{{ url_for('index') }}">Sobre</a>
+      <a href="{{ url_for('abrir_dashbordadm', id=session['id_usuario']) }}">Voltar</a>
   </nav>
 </header>
 
@@ -49,7 +50,6 @@
            title="Digite apenas números (11 dígitos, incluindo DDD)"
            required>
         <button type="submit"> Concluído </button>
-        <a href="dashbord_adm.html" class="delete-btn">Cancelar</a>
       </form>
         </div>
         <div class="text-container">

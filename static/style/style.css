@@ -317,6 +317,16 @@ button:hover,
   width: 140px;
 }
 
+.aula-dias{
+    margin-top: 20px;
+    display:grid;
+}
+
+.cainput{
+ height: 30px;
+ font-size:15px;
+}
+
 /* =========================================================
    Simple Cadastro (generic block)
    ========================================================= */
@@ -346,7 +356,7 @@ button:hover,
 }
 
 .cadastro form {
-  gap: 14px;
+  gap: 18px;
 }
 
 .cadastro button a {
@@ -972,7 +982,7 @@ button:hover,
 
   .cadastro-aula,
   .cadastro {
-    max-width: 100%;
+    max-width: 97%;
     padding: 0 20px;
   }
 
@@ -1037,7 +1047,7 @@ button:hover,
     font-size: 40px;
   }
 
-  
+
 }
 
 @media (max-width: 400px) {
@@ -1058,7 +1068,7 @@ button:hover,
     display: grid;
   }
 
-  
+
 }
 
 @media (min-width: 767px) {
@@ -1237,7 +1247,15 @@ button:hover,
     flex-direction: row;
     gap: 100px;
     padding: 20px;
+    position: fixed;
+    display: contents;
   }
+}
+
+@media (max-width: 769px){
+ .texto{
+ display:none;
+ }
 }
 
 @media (max-width: 850px) {
@@ -1245,9 +1263,12 @@ button:hover,
     margin: 0;
     text-align: center;
     align-self: center;
-    display: none;
+    margin-top: 50px;
+    margin-left: 25px;
   }
 }
+
+
 
 @media (min-width: 767px) {
   .intro {
@@ -1265,13 +1286,34 @@ button:hover,
     align-self: center;
     display: row-reverse;
     display: flow;
+    margin-top: 90px;
   }
+}
+
+
+
+@media (min-width: 767px){
+ .intro{
+ margin-left: 15px;
+ }
+}
+
+@media (min-width: 1023px){
+ .intro h2{
+ margin-left: -10px;
+ }
 }
 
 @media (min-width: 767px) {
   .cadastro {
     margin-top: 25px;
   }
+}
+
+@media (max-width: 767px){
+ .btn{
+ display:flex;
+ }
 }
 
 .rodapeadm {
@@ -1378,6 +1420,12 @@ button:hover,
 }
 .password-container .toggle-password:hover {
   opacity: 1;
+}
+
+@media (max-width: 767px){
+   .texto{
+   display:none;
+   }
 }
 
 
