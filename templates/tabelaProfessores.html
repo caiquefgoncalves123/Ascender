@@ -19,9 +19,23 @@
     </nav>
   </header>
 
+    {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="flash-messages">
+                    {% for category, message in messages %}
+                        <div class="flash {{ category }}">
+                            <span class="close-btn" onclick="this.parentElement.style.display='none';">&times;</span>
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
   <!-- Conteúdo -->
   <main class="dashboard">
     <h2 class="titulo-tabela">TABELA DE PROFESSORES</h2>
+    <a class="cadasau" href="{{ url_for('cadastroprofessor') }}"> Cadastrar professor</a>
 
     <table class="tabela-aulas">
       <thead>

@@ -23,6 +23,19 @@
     </nav>
   </header>
 
+      {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="flash-messages">
+                    {% for category, message in messages %}
+                <div class="flash {{ category }}">
+                        <span class="close-btn" onclick="this.parentElement.style.display='none';">&times;</span>
+                                {{ message }}
+                </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
   <!-- MAIN -->
   <main >
     <section class="intro">
@@ -59,23 +72,10 @@
            oninput="this.value = this.value.replace(/\D/g, '').slice(0,11);"
            title="Digite apenas números (11 dígitos, incluindo DDD)"
            required>
-        <input type="password" id="senha" name="senha" placeholder="Crie uma senha:" required>
+        <input type="password" id="senha" name="senha" placeholder="Crie uma senha:" title="A senha deve conter ao menos uma letra maiúscula,uma minúscula, um número e um caractere especial."  required>
         <input type="password" id="confirma" name="confirma" placeholder="Confirme sua senha:" required>
         <button type="submit"> Concluído </button>
       </form>
-         {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                <div class="flash-messages">
-                    {% for category, message in messages %}
-                <div class="flash {{ category }}">
-                        <span class="close-btn" onclick="this.parentElement.style.display='none';">&times;</span>
-                                {{ message }}
-                </div>
-                    {% endfor %}
-
-                </div>
-            {% endif %}
-        {% endwith %}
 
         {% if session.usuario is defined and session.usuario[5] == 0 %}
             <p class="cadastro"><a href="{{ url_for('abrir_dashbordadm', id=session.usuario[1]) }}">Voltar</a></p>

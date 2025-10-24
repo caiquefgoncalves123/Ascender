@@ -22,21 +22,22 @@
 
   <!-- Mensagens flash -->
   {% with messages = get_flashed_messages(with_categories=true) %}
-    {% if messages %}
-      <div class="flash-messages">
-        {% for category, message in messages %}
-          <div class="flash {{ category }}">
-            <span class="close-btn" onclick="this.parentElement.style.display='none';"></span>
-            {{ message }}
-          </div>
-        {% endfor %}
-      </div>
-    {% endif %}
-  {% endwith %}
+            {% if messages %}
+                <div class="flash-messages">
+                    {% for category, message in messages %}
+                        <div class="flash {{ category }}">
+                            <span class="close-btn" onclick="this.parentElement.style.display='none';">&times;</span>
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
 
   <!-- Conteúdo -->
   <main class="dashboard">
     <h2 class="titulo-tabela">TABELA DE AULAS</h2>
+    <a class="cadasau" href="{{ url_for('cadastroaula') }}"> Cadastrar aula</a>
 
     <table class="tabela-aulas">
       <thead>

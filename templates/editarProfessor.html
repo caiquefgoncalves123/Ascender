@@ -18,6 +18,19 @@
     </nav>
   </header>
 
+   {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="flash-messages">
+                    {% for category, message in messages %}
+                        <div class="flash {{ category }}">
+                            <span class="close-btn" onclick="this.parentElement.style.display='none';">&times;</span>
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
   <!-- FORM -->
   <div class="container">
     <div class="cadastro">

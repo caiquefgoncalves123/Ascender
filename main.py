@@ -102,8 +102,8 @@ def cadastro():
 
         # Se não atender aos critérios, bloqueia o cadastro
         if not (maiuscula and minuscula and numero and caracterpcd):
-            flash('A senha deve conter ao menos uma letra maiúscula, \numa minúscula, um número e um caractere especial.',
-                  'danger')
+            flash('A senha não está dentro dos parâmetros.',
+                  'error')
             return redirect(url_for('cadastro'))
 
         # Verifica o tamanho da senha
@@ -314,10 +314,19 @@ def situacao(id):
 @app.route('/ver_alunos')
 def ver_alunos():
     if 'id_usuario' not in session:
+        flash('Usuário não está logado')
         return redirect(url_for('login'))
 
     cursor = con.cursor()
     try:
+        cursor.execute("SELECT id_usuario, tipo FROM usuario WHERE id_usuario = ?", (session['id_usuario'],))
+        tipo = cursor.fetchone()
+
+
+        if tipo[1] == 2:
+            flash('Sai fora, você não é administrador!')
+            return redirect(url_for('login'))
+
         cursor.execute("SELECT id_usuario, nome, email, telefone, cpf, situacao FROM usuario WHERE tipo = 2")
         alunos = cursor.fetchall()
         qtd = len(alunos)
@@ -478,14 +487,6 @@ def cadastroaula():
             sexta = 1 if 'sexta' in request.form else 0
             sabado = 1 if 'sabado' in request.form else 0
 
-            # segunda = request.form['segunda']
-            # terca = request.form['terca']
-            # quarta = request.form['quarta']
-            # quinta = request.form['quinta']
-            # sexta = request.form['sexta']
-            # sabado = request.form['sabado']
-             # dias_selecionados = request.form.getlist('dias')
-
             hora = request.form['hora']
             hora_fim = request.form['hora_fim']
             capacidade = request.form['capacidade']
@@ -502,14 +503,24 @@ def cadastroaula():
 
 
 
-
             # Verifica se a aula já está cadastrado
-            cursor.execute("""SELECT 1 FROM AULAS  
-                               WHERE ID_USUARIO  =? AND ID_MODALIDADE  = ? AND SEGUNDA =? 
-                                 AND TERCA =? AND QUARTA =? AND QUINTA =? AND SEXTA =? 
-                                 AND SABADO =? AND HORA = ? AND HORA_FIM = ?""",
+            cursor.execute("""SELECT 1
+                            FROM AULAS
+                            WHERE ID_USUARIO = ?
+                              AND ID_MODALIDADE = ?
+                              AND ((SEGUNDA = 1 AND ? = 1) OR
+                                    (TERCA   = 1 AND ?   = 1) OR
+                                    (QUARTA  = 1 AND ?  = 1) OR
+                                    (QUINTA  = 1 AND ?  = 1) OR
+                                    (SEXTA   = 1 AND ?   = 1) OR
+                                    (SABADO  = 1 AND ?  = 1))
+                              AND ((? BETWEEN HORA AND HORA_FIM)
+                                    OR (HORA BETWEEN ? AND ?)
+                                    OR (? BETWEEN HORA AND HORA_FIM));
+                            """,
                            (id_usuario, id_modalidade, segunda, terca,
-                            quarta, quinta, sexta, sabado, hora, hora_fim))
+                            quarta, quinta, sexta, sabado,
+                            hora, hora, hora_fim, hora_fim))
             if cursor.fetchone():  # Verifica se a consulta retornou algum resultado
                 flash('Essa aula já está cadastrada', 'error')
                 return redirect(url_for('cadastroaula'))
@@ -529,16 +540,6 @@ def cadastroaula():
         return render_template('cadastroAula.html', professores=professores, modalidades=modalidades)
     finally:
         cursor.close()
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -688,7 +689,6 @@ def cadastromodalidade():
 
         finally:
             cursor.close()
-            flash('Modalidade cadastrada com sucesso!', 'success')
             return redirect(url_for('abrir_tabelamodalidade'))
 
     return render_template('cadastroModalidade.html')
