@@ -14,15 +14,33 @@
     </div>
     <nav>
       <a href="{{ url_for('index') }}">Sobre</a>
+        {% if session.usuario is defined and session.usuario[5] == 0 %}
+            <p ><a href="{{ url_for('abrir_dashbordadm', id=session.usuario[1]) }}">Voltar</a></p>
+        {% else %}
+            <p ><a href="{{ url_for('abrir_dashbordaluno', id=session.usuario[1]) }}">Voltar</a></p>
+        {% endif %}
     </nav>
   </header>
+
+  {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="flash-messages">
+                    {% for category, message in messages %}
+                        <div class="flash {{ category }}">
+                            <span class="close-btn" onclick="this.parentElement.style.display='none';">&times;</span>
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
 
   <!-- FORM -->
   <div class="container">
     <div class="cadastro">
       <h2>Edite o perfil</h2>
       <form method="POST" action="{{ url_for('editar_usuario', id=usuario[0]) }}">
-        <input name="nome" id="nome" type="text" value="{{ usuario[1] }}" placeholder="Nome">
+       <input name="nome" id="nome" type="text" value="{{ usuario[1] }}" placeholder="Nome" required pattern="[A-Za-zÀ-ÿ\s]+" title="Somente letras são permitidas">
         <input name="email" id="email" type="email" value="{{ usuario[2] }}" placeholder="Email">
         <input name="cpf"
          id="cpf"
@@ -46,7 +64,7 @@
          oninput="this.value = this.value.replace(/\D/g, '').slice(0,11);"
          title="Digite apenas números (11 dígitos)"
          required>
-        <input name="senha" id="senha" type="password" placeholder="Senha">
+         <input type="password" id="senha" name="senha" placeholder="Crie uma senha:" title="A senha deve conter ao menos uma letra maiúscula,uma minúscula, um número e um caractere especial."  required>
 
         <div>
           <button type="submit" class="save-btn">Salvar</button>

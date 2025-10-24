@@ -36,7 +36,7 @@
     <div class="cadastro">
       <h2>Editar Professor</h2>
       <form method="POST" action="{{ url_for('editar_professor', id=professor[0]) }}">
-        <input name="nome" id="nome" type="text" value="{{ professor[1] }}" placeholder="Nome">
+        <input name="nome" id="nome" type="text" value="{{ professor[1] }}" placeholder="Nome" required pattern="[A-Za-zÀ-ÿ\s]+" title="Somente letras são permitidas">
         <input name="email" id="email" type="email" value="{{ professor[2] }}" placeholder="Email">
         <input name="cpf"
          id="cpf"

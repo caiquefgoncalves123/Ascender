@@ -20,11 +20,25 @@
     </nav>
   </header>
 
+     {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="flash-messages">
+                    {% for category, message in messages %}
+                        <div class="flash {{ category }}">
+                            <span class="close-btn" onclick="this.parentElement.style.display='none';">&times;</span>
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
     <!-- MAIN -->
     <main class="main" >
       <section class="cadastro">
         <div class="intro">
           <h2>Cadastre uma <br> aula</h2>
+
         </div>
         <div class="cadastro-aula">
             <div class="aula-coisas">

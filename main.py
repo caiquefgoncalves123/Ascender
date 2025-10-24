@@ -69,7 +69,7 @@ def cadastro():
     if request.method == 'POST':
         # Coleta dados do formulário
         nome = request.form['nome'].strip()
-        email = request.form['email'].strip()
+        email = request.form['email'].strip().lower()
         cpf = request.form['cpf'].strip()
         telefone = request.form['telefone'].strip()
         senha = request.form['senha']
@@ -146,7 +146,7 @@ def cadastro():
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        email = request.form['email']
+        email = request.form['email'].lower()
         senha = request.form['senha']
 
         cursor = con.cursor()
@@ -217,7 +217,7 @@ def editar_usuario(id):
 
     if request.method == 'POST':
         nome = request.form['nome']
-        email = request.form['email']
+        email = request.form['email'].lower()
         senha = request.form['senha']
         cpf = request.form['cpf']
         telefone = request.form['telefone']
@@ -244,9 +244,8 @@ def editar_usuario(id):
 
             # Se não atender aos critérios, bloqueia o cadastro
             if not (maiuscula and minuscula and numero and caracterpcd):
-                flash(
-                    'A senha deve conter ao menos uma letra maiúscula, \numa minúscula, um número e um caractere especial.',
-                    'danger')
+                flash('A senha não está dentro dos parâmetros.',
+                      'error')
                 return redirect(url_for('editar_usuario', id=id))
 
             # Verifica o tamanho da senha
@@ -497,8 +496,10 @@ def cadastroaula():
 
 
             if capacidade <= '0':
-                flash("A capacidade precisa ser maior que 0!")
+                flash("A capacidade precisa ser maior que 0!", 'error')
                 return redirect(url_for('cadastroaula'))
+
+
 
 
 
@@ -507,7 +508,6 @@ def cadastroaula():
             cursor.execute("""SELECT 1
                             FROM AULAS
                             WHERE ID_USUARIO = ?
-                              AND ID_MODALIDADE = ?
                               AND ((SEGUNDA = 1 AND ? = 1) OR
                                     (TERCA   = 1 AND ?   = 1) OR
                                     (QUARTA  = 1 AND ?  = 1) OR
@@ -518,11 +518,11 @@ def cadastroaula():
                                     OR (HORA BETWEEN ? AND ?)
                                     OR (? BETWEEN HORA AND HORA_FIM));
                             """,
-                           (id_usuario, id_modalidade, segunda, terca,
+                           (id_usuario, segunda, terca,
                             quarta, quinta, sexta, sabado,
                             hora, hora, hora_fim, hora_fim))
             if cursor.fetchone():  # Verifica se a consulta retornou algum resultado
-                flash('Essa aula já está cadastrada', 'error')
+                flash('Esse horário já está ocupado!', 'error')
                 return redirect(url_for('cadastroaula'))
 
 
@@ -569,8 +569,8 @@ def cadastroprofessor():
         return redirect(url_for('login'))
 
     if request.method == 'POST':
-        nome = request.form['nome'].strip()
-        email = request.form['email'].strip()
+        nome = request.form['nome'].strip().capitalize()
+        email = request.form['email'].strip().lower()
         cpf = request.form['cpf'].strip()
         telefone = request.form['telefone'].strip()
         cursor = con.cursor()
@@ -616,11 +616,16 @@ def editar_professor(id):
         flash("Usuário não foi encontrado")
         return redirect(url_for('cadastroprofessor'))
 
+
     if request.method == 'POST':
-        nome = request.form['nome']
-        email = request.form['email']
+        nome = request.form['nome'].capitalize().strip()
+        email = request.form['email'].lower()
         cpf = request.form['cpf']
         telefone = request.form['telefone']
+
+        if not nome:
+            flash("O nome não pode estar vazio.", "error")
+            return redirect(url_for('editar_professor', id=id))
 
         # Verifica se o email já existe
         cursor.execute("SELECT 1 FROM usuario WHERE email = ? AND id_usuario != ?", (email, id))
@@ -643,9 +648,6 @@ def editar_professor(id):
 
     return render_template('editarProfessor.html', professor=professor)
 
-
-
-
 # -------------------------------------------------------
 # ABRIR TABELA Modalidade
 # -------------------------------------------------------
@@ -663,7 +665,6 @@ def abrir_tabelamodalidade():
 
     return render_template('tabelaModalidade.html', modalidades=modalidades)
 
-
 # -------------------------------------------------------
 # CADASTRO DE MODALIDADE
 # -------------------------------------------------------
@@ -673,8 +674,13 @@ def cadastromodalidade():
         return redirect(url_for('login'))
 
     if request.method == 'POST':
-        nome = request.form['nome']
+        nome = request.form['nome'].capitalize().strip()
         cursor = con.cursor()
+
+        if not nome:
+            flash("O nome não pode estar vazio.", "error")
+            return redirect(url_for('cadastromodalidade'))
+
         try:
             cursor.execute("SELECT 1 FROM modalidade WHERE nome = ?", (nome,))
             if cursor.fetchone():
@@ -710,7 +716,7 @@ def editar_modalidade(id):
         return redirect(url_for('cadastromodalidade'))
 
     if request.method == 'POST':
-        nome = request.form['nome']
+        nome = request.form['nome'].capitalize().strip()
 
         # Verifica se já existe outra modalidade com o mesmo nome
         cursor.execute(
@@ -762,8 +768,6 @@ def deletar(id):
         cursor.close()
 
     return redirect(url_for('abrir_tabelamodalidade'))
-
-
 
 # -------------------------------------------------------
 # EXECUÇÃO DA APLICAÇÃO

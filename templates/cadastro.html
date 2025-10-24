@@ -51,7 +51,7 @@
       <form action="{{ url_for('cadastro') }}" method="post" >
 
 
-        <input type="text" id="nome" name="nome" placeholder="Digite seu nome:" required>
+        <input type="text" id="nome" name="nome" placeholder="Digite seu nome:" required pattern="[A-Za-zÀ-ÿ\s]+" title="Somente letras são permitidas">
         <input type="email" id="email" name="email" placeholder="Digite seu e-mail:" required>
         <input type="text"
            id="cpf"
@@ -73,7 +73,7 @@
            title="Digite apenas números (11 dígitos, incluindo DDD)"
            required>
         <input type="password" id="senha" name="senha" placeholder="Crie uma senha:" title="A senha deve conter ao menos uma letra maiúscula,uma minúscula, um número e um caractere especial."  required>
-        <input type="password" id="confirma" name="confirma" placeholder="Confirme sua senha:" required>
+        <input type="password" id="confirma" name="confirma" placeholder="Confirme sua senha:" title="A senha deve conter ao menos uma letra maiúscula,uma minúscula, um número e um caractere especial." required>
         <button type="submit"> Concluído </button>
       </form>
 
