@@ -7,6 +7,8 @@
   <link rel="stylesheet" href=  "../static/style/style.css">
 </head>
 <body>
+
+
   <!-- HEADER -->
   <header>
     <div class="logo">
@@ -18,10 +20,26 @@
     </nav>
   </header>
 
+      {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="flash-messages">
+                    {% for category, message in messages %}
+    <div class="flash {{ category }}">
+        <span class="close-btn" onclick="this.parentElement.style.display='none';">&times;</span>
+        {{ message }}
+    </div>
+{% endfor %}
+
+                </div>
+            {% endif %}
+        {% endwith %}
+
   <!-- FORM -->
   <div class="container">
     <div class="cadastro">
       <h2>Editar Modalidade</h2>
+
+
       <form method="POST" action="{{ url_for('editar_modalidade', id=modalidade[0]) }}">
         <input name="nome" id="nome" type="text" value="{{ modalidade[1] }}" placeholder="Nome" required >
         <div>

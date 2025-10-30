@@ -1282,7 +1282,20 @@ button:hover,
   }
 }
 
+@media (max-width: 769px){
+  .intro .loginin{
+   display:none;
+  }
 
+  .login form input{
+   width:60%;
+   align-self: center;
+  }
+
+  .intro .cadasin{
+   display:none;
+  }
+}
 
 @media (min-width: 767px) {
   .intro {
@@ -1520,4 +1533,51 @@ button:hover,
 .flash.warning {
   background: linear-gradient(135deg, #7d8b72, #a6b39b);
   color: #222;
+}
+
+.aula-dias {
+  display: flex;
+  justify-content: center;
+  gap: 30px; /* espaço entre as colunas */
+  font-family: 'Poppins', sans-serif;
+  margin-top: 20px;
+}
+
+/* Cada coluna de dias */
+.aula-dias div {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* Label (texto dos dias) */
+.aula-dias label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 16px;
+  color: #333;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.aula-dias label:hover {
+  color: #1a73e8;
+}
+
+/* Checkbox */
+.aula-dias input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  accent-color: #1a73e8;
+  cursor: pointer;
+}
+
+
+@media (max-width: 600px) {
+  .aula-dias {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 15px;
+  }
 }

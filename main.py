@@ -41,8 +41,17 @@ def abrir_dashbordadm(id):
     if 'id_usuario' not in session:
         return redirect(url_for('login'))
 
+
     # Busca dados do usuário logado
     cursor = con.cursor()
+
+    cursor.execute("SELECT id_usuario, tipo FROM usuario WHERE id_usuario = ?", (session['id_usuario'],))
+    tipo = cursor.fetchone()
+
+    if tipo[1] == 2:
+        flash('Acesso negado, você não é Administrador!')
+        return redirect(url_for('login'))
+
     cursor.execute('select id_usuario, nome, email, telefone, cpf from usuario where id_usuario = ?', (id,))
     usuario = cursor.fetchone()
     return render_template('dashbord_adm.html', usuario=usuario)
@@ -204,6 +213,9 @@ def logout():
     session.pop("usuario", None)# Remove o ID do usuário da sessão
     return redirect(url_for('index'))
 
+
+
+
 @app.route('/editar_usuario/<int:id>', methods=['GET', 'POST'])
 def editar_usuario(id):
     cursor = con.cursor()
@@ -216,7 +228,7 @@ def editar_usuario(id):
         return redirect(url_for('cadastro'))
 
     if request.method == 'POST':
-        nome = request.form['nome']
+        nome = request.form['nome'].strip().capitalize()
         email = request.form['email'].lower()
         senha = request.form['senha']
         cpf = request.form['cpf']
@@ -283,8 +295,10 @@ def situacao(id):
     if 'id_usuario' not in session:
         return redirect(url_for('login'))
 
+
     cursor = con.cursor()
     try:
+
         # Busca a situação atual do usuário (1 = ativo, 0 = bloqueado)
         cursor.execute("SELECT situacao FROM usuario WHERE id_usuario = ?", (id,))
         resultado = cursor.fetchone()
@@ -318,12 +332,21 @@ def ver_alunos():
 
     cursor = con.cursor()
     try:
+
+        cursor.execute("SELECT id_usuario, tipo FROM usuario WHERE id_usuario = ?", (session['id_usuario'],))
+        tipo = cursor.fetchone()
+
+        if tipo[1] == 2:
+            flash('Acesso negado, você não é Administrador!')
+            return redirect(url_for('login'))
+
+
         cursor.execute("SELECT id_usuario, tipo FROM usuario WHERE id_usuario = ?", (session['id_usuario'],))
         tipo = cursor.fetchone()
 
 
         if tipo[1] == 2:
-            flash('Sai fora, você não é administrador!')
+            flash('Acesso Negado!')
             return redirect(url_for('login'))
 
         cursor.execute("SELECT id_usuario, nome, email, telefone, cpf, situacao FROM usuario WHERE tipo = 2")
@@ -367,6 +390,8 @@ def situacaoModalidade(id):
 
     cursor = con.cursor()
     try:
+
+
         # Busca a situação atual do usuário (1 = ativo, 0 = bloqueado)
         cursor.execute("SELECT situacao FROM modalidade WHERE id_modalidade = ?", (id,))
         resultado = cursor.fetchone()
@@ -399,6 +424,14 @@ def abrir_tabelaaulasadm():
 
     cursor = con.cursor()
     try:
+        cursor.execute("SELECT id_usuario, tipo FROM usuario WHERE id_usuario = ?", (session['id_usuario'],))
+        tipo = cursor.fetchone()
+
+        if tipo[1] == 2:
+            flash('Acesso negado, você não é Administrador!')
+            return redirect(url_for('login'))
+
+
         cursor.execute("""SELECT a.id_aulas
                                   , u.nome AS professor
                                   , m.nome AS modalidade
@@ -463,13 +496,18 @@ def cadastroaula():
 
     try:  # tratamento de erro
 
+        cursor.execute("SELECT id_usuario, tipo FROM usuario WHERE id_usuario = ?", (session['id_usuario'],))
+        tipo = cursor.fetchone()
+
+        if tipo[1] == 2:
+            flash('Acesso negado, você não é Administrador!')
+            return redirect(url_for('login'))
+
         cursor.execute("SELECT id_usuario, nome FROM usuario WHERE tipo = 1 ")
         professores = cursor.fetchall()
-        print(professores)
 
         cursor.execute("SELECT id_modalidade, nome FROM modalidade where coalesce(situacao, 0) = 0")
         modalidades = cursor.fetchall()
-
 
 
         if request.method == 'POST':
@@ -498,10 +536,6 @@ def cadastroaula():
             if capacidade <= '0':
                 flash("A capacidade precisa ser maior que 0!", 'error')
                 return redirect(url_for('cadastroaula'))
-
-
-
-
 
 
             # Verifica se a aula já está cadastrado
@@ -549,16 +583,38 @@ def cadastroaula():
 @app.route('/abrir_tabelaprofessores')
 def abrir_tabelaprofessores():
     if 'id_usuario' not in session:
+        flash('Usuário não está logado')
         return redirect(url_for('login'))
 
     cursor = con.cursor()
     try:
-        cursor.execute("SELECT id_usuario, nome, email, telefone, cpf, situacao FROM usuario WHERE tipo = 1")
-        professor = cursor.fetchall()
+        # Busca o tipo do usuário logado
+        cursor.execute("SELECT tipo FROM usuario WHERE id_usuario = ?", (session['id_usuario'],))
+        usuario = cursor.fetchone()
+
+        if not usuario:
+            flash('Usuário não encontrado!')
+            return redirect(url_for('login'))
+
+        tipo_usuario = usuario[0]  # Firebird retorna tupla (tipo,)
+
+        # Verifica se é administrador
+        if tipo_usuario == 2:
+            flash('Acesso negado, você não é Administrador!')
+            return redirect(url_for('login'))
+
+        # Busca todos os professores (tipo = 1)
+        cursor.execute("""
+            SELECT id_usuario, nome, email, telefone, cpf, situacao
+            FROM usuario
+            WHERE tipo = 1
+        """)
+        professores = cursor.fetchall()
+
     finally:
         cursor.close()
 
-    return render_template('tabelaProfessores.html', professor=professor)
+    return render_template('tabelaProfessores.html', professor=professores)
 
 # -------------------------------------------------------
 # CADASTRAR PROFESSOR
@@ -566,38 +622,56 @@ def abrir_tabelaprofessores():
 @app.route('/cadastroprofessor', methods=['GET', 'POST'])
 def cadastroprofessor():
     if 'id_usuario' not in session:
+        flash('Usuário não está logado')
         return redirect(url_for('login'))
 
-    if request.method == 'POST':
-        nome = request.form['nome'].strip().capitalize()
-        email = request.form['email'].strip().lower()
-        cpf = request.form['cpf'].strip()
-        telefone = request.form['telefone'].strip()
-        cursor = con.cursor()
-        try:
+    cursor = con.cursor()
+    try:
+        # Busca o tipo do usuário logado
+        cursor.execute("SELECT tipo FROM usuario WHERE id_usuario = ?", (session['id_usuario'],))
+        usuario = cursor.fetchone()
+
+        if not usuario:
+            flash('Usuário não encontrado!')
+            return redirect(url_for('login'))
+
+        tipo_usuario = usuario[0]  # Firebird retorna tupla (tipo,)
+
+        # Verifica se é administrador
+        if tipo_usuario == 2:
+            flash('Acesso negado, você não é Administrador!')
+            return redirect(url_for('login'))
+
+        # Se o formulário foi enviado
+        if request.method == 'POST':
+            nome = request.form['nome'].strip().capitalize()
+            email = request.form['email'].strip().lower()
+            cpf = request.form['cpf'].strip()
+            telefone = request.form['telefone'].strip()
+
+            # Validação: nome não pode estar vazio
+            if not nome:
+                flash("O nome não pode estar vazio.", "error")
+                return redirect(url_for('cadastroprofessor'))
+
             # Verifica se o e-mail já está cadastrado
             cursor.execute("SELECT 1 FROM usuario WHERE email = ?", (email,))
             if cursor.fetchone():
                 flash('Esse e-mail já está cadastrado!', 'error')
                 return redirect(url_for('cadastroprofessor'))
 
-            # Verifica nome vazio
-            if not nome:
-                flash("O nome não pode estar vazio.", "error")
-                return redirect(url_for('cadastroprofessor'))
-
-            # Insere novo professor
-            cursor.execute(
-                "INSERT INTO usuario (tipo, nome, email, cpf, telefone) VALUES (?, ?, ?, ?, ?)",
-                (1, nome, email, cpf, telefone)
-            )
+            # Cadastra novo professor (tipo = 1)
+            cursor.execute("""
+                INSERT INTO usuario (tipo, nome, email, cpf, telefone)
+                VALUES (?, ?, ?, ?, ?)
+            """, (1, nome, email, cpf, telefone))
             con.commit()
 
             flash('Professor cadastrado com sucesso!', 'success')
             return redirect(url_for('abrir_tabelaprofessores'))
 
-        finally:
-            cursor.close()
+    finally:
+        cursor.close()
 
     return render_template('cadastroProfessor.html')
 
@@ -608,6 +682,13 @@ def cadastroprofessor():
 @app.route('/editar_professor/<int:id>', methods=['GET', 'POST'])
 def editar_professor(id):
     cursor = con.cursor()
+    cursor.execute("SELECT id_usuario, tipo FROM usuario WHERE id_usuario = ?", (session['id_usuario'],))
+    tipo = cursor.fetchone()
+
+    if tipo[1] == 2:
+        flash('Acesso negado, você não é Administrador!')
+        return redirect(url_for('login'))
+
     cursor.execute('SELECT id_usuario, nome, email, telefone, tipo, cpf FROM usuario WHERE id_usuario = ?', (id,))
     professor = cursor.fetchone()
 
@@ -654,16 +735,35 @@ def editar_professor(id):
 @app.route('/abrir_tabelamodalidade')
 def abrir_tabelamodalidade():
     if 'id_usuario' not in session:
+        flash('Usuário não está logado')
         return redirect(url_for('login'))
 
     cursor = con.cursor()
     try:
+        # Busca o tipo do usuário logado
+        cursor.execute("SELECT tipo FROM usuario WHERE id_usuario = ?", (session['id_usuario'],))
+        usuario = cursor.fetchone()
+
+        if not usuario:
+            flash('Usuário não encontrado!')
+            return redirect(url_for('login'))
+
+        tipo_usuario = usuario[0]  # Firebird retorna tupla (tipo,)
+
+        # Verifica se é administrador
+        if tipo_usuario == 2:
+            flash('Acesso negado, você não é Administrador!')
+            return redirect(url_for('login'))
+
+        # Busca todas as modalidades
         cursor.execute("SELECT id_modalidade, nome, situacao FROM modalidade")
-        modalidades= cursor.fetchall()
+        modalidades = cursor.fetchall()
+
     finally:
         cursor.close()
 
     return render_template('tabelaModalidade.html', modalidades=modalidades)
+
 
 # -------------------------------------------------------
 # CADASTRO DE MODALIDADE
@@ -671,32 +771,51 @@ def abrir_tabelamodalidade():
 @app.route('/cadastromodalidade', methods=['GET', 'POST'])
 def cadastromodalidade():
     if 'id_usuario' not in session:
+        flash('Usuário não está logado')
         return redirect(url_for('login'))
 
-    if request.method == 'POST':
-        nome = request.form['nome'].capitalize().strip()
-        cursor = con.cursor()
+    cursor = con.cursor()
+    try:
+        # Busca o tipo do usuário logado
+        cursor.execute("SELECT tipo FROM usuario WHERE id_usuario = ?", (session['id_usuario'],))
+        usuario = cursor.fetchone()
 
-        if not nome:
-            flash("O nome não pode estar vazio.", "error")
-            return redirect(url_for('cadastromodalidade'))
+        if not usuario:
+            flash('Usuário não encontrado!')
+            return redirect(url_for('login'))
 
-        try:
+        tipo_usuario = usuario[0]  # Firebird retorna tupla (tipo,)
+
+        # Verifica se é administrador
+        if tipo_usuario == 2:
+            flash('Acesso negado, você não é Administrador!')
+            return redirect(url_for('login'))
+
+        # Se o formulário foi enviado
+        if request.method == 'POST':
+            nome = request.form['nome'].capitalize().strip()
+
+            if not nome:
+                flash("O nome não pode estar vazio.", "error")
+                return redirect(url_for('cadastromodalidade'))
+
+            # Verifica duplicidade
             cursor.execute("SELECT 1 FROM modalidade WHERE nome = ?", (nome,))
             if cursor.fetchone():
                 flash('Essa modalidade já está cadastrada!', 'error')
                 return redirect(url_for('cadastromodalidade'))
-            else:
-                flash('Modalidade cadastrada com sucesso!', 'success')
 
-            cursor.execute(
-                "INSERT INTO modalidade (nome) VALUES (?)", (nome,))
+            # Cadastra nova modalidade
+            cursor.execute("INSERT INTO modalidade (nome) VALUES (?)", (nome,))
             con.commit()
 
-        finally:
-            cursor.close()
+            flash('Modalidade cadastrada com sucesso!', 'success')
             return redirect(url_for('abrir_tabelamodalidade'))
 
+    finally:
+        cursor.close()
+
+    # Renderiza o formulário
     return render_template('cadastroModalidade.html')
 
 # -------------------------------------------------------
@@ -704,47 +823,72 @@ def cadastromodalidade():
 # -------------------------------------------------------
 @app.route('/editar_modalidade/<int:id>', methods=['GET', 'POST'])
 def editar_modalidade(id):
+    if 'id_usuario' not in session:
+        flash('Usuário não está logado')
+        return redirect(url_for('login'))
+
     cursor = con.cursor()
+    try:
+        # Busca o tipo do usuário logado
+        cursor.execute("SELECT tipo FROM usuario WHERE id_usuario = ?", (session['id_usuario'],))
+        usuario = cursor.fetchone()
 
-    # Buscar a modalidade que será editada
-    cursor.execute('SELECT id_modalidade, nome FROM modalidade WHERE id_modalidade = ?', (id,))
-    modalidade = cursor.fetchone()
+        if not usuario:
+            flash('Usuário não encontrado!')
+            return redirect(url_for('login'))
 
-    if not modalidade:
-        cursor.close()
-        flash("Modalidade não foi encontrada", "error")
-        return redirect(url_for('cadastromodalidade'))
+        tipo_usuario = usuario[0]  # Firebird retorna tupla
 
-    if request.method == 'POST':
-        nome = request.form['nome'].capitalize().strip()
+        # Verifica se é administrador (só admins podem editar)
+        if tipo_usuario == 2:
+            flash('Acesso negado, você não é Administrador!')
+            return redirect(url_for('login'))
 
-        # Verifica se já existe outra modalidade com o mesmo nome
-        cursor.execute(
-            'SELECT id_modalidade FROM modalidade WHERE nome = ? AND id_modalidade != ?',
-            (nome, id)
-        )
-        existente = cursor.fetchone()
+        # Busca a modalidade que será editada
+        cursor.execute("SELECT id_modalidade, nome FROM modalidade WHERE id_modalidade = ?", (id,))
+        modalidade = cursor.fetchone()
 
-        if existente:
-            flash('Essa modalidade já está cadastrada!', 'error')
-            cursor.close()
-            return redirect(url_for('editar_modalidade', id=id))
+        if not modalidade:
+            flash("Modalidade não foi encontrada", "error")
+            return redirect(url_for('cadastromodalidade'))
 
-        # Atualiza os dados no banco
-        cursor.execute(
-            'UPDATE modalidade SET nome = ? WHERE id_modalidade = ?',
-            (nome, id)
-        )
-        con.commit()
-        cursor.close()
+        # Se o formulário foi enviado
+        if request.method == 'POST':
+            nome = request.form['nome'].capitalize().strip()
 
-        flash('Modalidade atualizada com sucesso!', 'success')
+            if not nome:
+                flash("O nome não pode estar vazio.", "error")
+                return redirect(url_for('editar_modalidade', id=id))
 
-        # Redireciona conforme o tipo de usuário
-        if session['usuario'][5] == 0:
+            # Verifica se já existe outra modalidade com o mesmo nome
+            cursor.execute("""
+                SELECT id_modalidade
+                FROM modalidade
+                WHERE nome = ? AND id_modalidade != ?
+            """, (nome, id))
+            existente = cursor.fetchone()
+
+            if existente:
+                flash('Essa modalidade já está cadastrada!', 'error')
+                return redirect(url_for('editar_modalidade', id=id))
+
+            # Atualiza a modalidade
+            cursor.execute("""
+                UPDATE modalidade
+                SET nome = ?
+                WHERE id_modalidade = ?
+            """, (nome, id))
+            con.commit()
+
+            flash('Modalidade atualizada com sucesso!', 'success')
             return redirect(url_for('abrir_tabelamodalidade'))
 
+    finally:
+        cursor.close()
+
+    # Renderiza o template de edição
     return render_template('editarModalidade.html', modalidade=modalidade)
+
 
 # -------------------------------------------------------
 # DELETAR MODALIDADE
