@@ -137,10 +137,16 @@ def cadastro():
 
             # Insere novo usuário (tipo = 2 → aluno)
             cursor.execute(
-                "INSERT INTO usuario (tipo, nome, email, cpf, telefone, senha, situacao, tentativas) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+                "INSERT INTO usuario (tipo, nome, email, cpf, telefone, senha, situacao, tentativas) VALUES (?, ?, ?, ?, ?, ?, ?, ?) RETURNING id_usuario",
                 (2, nome, email, cpf, telefone, senha_cripto, 0, 0)
             )
+            id_usuario = cursor.fetchone()[0]
+            print(id_usuario)
             con.commit()
+            print('aqui')
+            arquivo = request.files['arquivo']
+            arquivo.save(f'uploads/foto{id_usuario}.jpg')
+            print('aqui2')
         finally:
             cursor.close()
 
@@ -912,6 +918,14 @@ def deletar(id):
         cursor.close()
 
     return redirect(url_for('abrir_tabelamodalidade'))
+
+# -------------------------------------------------------
+# UPLOAD IMAGEM
+# -------------------------------------------------------
+@app.route('/uploads/<nome_arquivo>')
+def imagem(nome_arquivo):
+    print('aqui3')
+    return send_from_directory('uploads', nome_arquivo)
 
 # -------------------------------------------------------
 # EXECUÇÃO DA APLICAÇÃO
