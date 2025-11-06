@@ -50,6 +50,7 @@
         </tr>
       </thead>
       <tbody>
+
         {% for aula in aulas %}
         <tr>
           <td data-label="Modalidade">{{ aula[2] }}</td>
@@ -57,9 +58,19 @@
           <td data-label="Dias">{{ aula[6] }}</td>
           <td data-label="Horário início">{{ aula[4] }} </td>
           <td data-label="Horário fim">{{ aula[5] }}</td>
-          <td data-label="Capacidade">{{ aula[3] }}</td>
-          <td class="editar">
-            <a href="{{ url_for('inscrever', id=aulas[0]) }}"><button>Inscreva-se</button></a>
+          <td data-label="Capacidade">{{ aula[7] }}</td>
+<!--          <td><form method="POST" action="{{ url_for('inscrever', id=aula[0]) }}">-->
+<!--              <button type="submit">Inscreva-se</button>-->
+<!--            </form></td>-->
+
+          <td class="editar"><a href="{{ url_for('situacao_aula', id=aula[0]) }}"
+               onclick="return confirm('Deseja realmente alterar sua inscrição??')">
+              {% if aula[2] == 1 %}
+                Inscreva-se
+              {% else %}
+                Cancelar inscrição
+              {% endif %}
+            </a>
           </td>
 
         </tr>

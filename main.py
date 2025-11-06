@@ -1,7 +1,7 @@
 from flask import Flask, render_template, redirect, request, flash, url_for, session, send_from_directory, send_file
 import fdb  # Biblioteca para conexão com banco de dados Firebird
 from flask_bcrypt import generate_password_hash, check_password_hash  # Criptografia de senhas
-#from fpdf import FPDF  # Geração de arquivos PDF (não utilizada neste código)
+from fpdf import FPDF  # Geração de arquivos PDF (não utilizada neste código)
 
 # Cria uma instância da aplicação Flask
 app = Flask(__name__)
@@ -67,6 +67,7 @@ def abrir_dashbordaluno(id):
     cursor = con.cursor()
     cursor.execute('select id_usuario, nome, email, telefone, cpf from usuario where id_usuario = ?', (id,))
     usuario = cursor.fetchone()
+
     return render_template('dashboardaluno.html', usuario=usuario)
 
 
@@ -317,6 +318,40 @@ def situacao(id):
         cursor.close()
 
     return redirect(url_for('ver_alunos'))
+
+# -------------------------------------------------------
+# INSCREVER/CANCELAR AULA
+# -------------------------------------------------------
+@app.route('/situacao_aula/<int:id>')
+def situacao_aula(id):
+    # Verifica se o usuário está logado
+    if 'id_usuario' not in session:
+        return redirect(url_for('login'))
+    cursor = con.cursor()
+    try:
+
+        # Busca a situação atual do usuário (1 = ativo, 0 = bloqueado)
+        cursor.execute("SELECT situacao FROM aulas_aluno WHERE id_aulas = ?", (id,))
+        resultado = cursor.fetchone()
+
+        if resultado:
+            status_atual = resultado[0]
+
+            # Troca o status: se estiver ativo, bloqueia; se estiver bloqueado, ativa
+            if status_atual == 1:
+                novo_status = 0
+            else:
+                novo_status = 1
+
+            # Atualiza no banco
+            cursor.execute("UPDATE aulas_aluno SET situacao = ? WHERE id_aulas = ?", (novo_status, id))
+            con.commit()
+
+    finally:
+        cursor.close()
+
+    return redirect(url_for('abrir_tabelaaulas'))
+
 
 # -------------------------------------------------------
 # LISTAR USUÁRIOS (VISÃO DO ADMIN)
@@ -570,22 +605,18 @@ def cadastroaula():
 
 
             # Verifica se a aula já está cadastrado
-            cursor.execute("""SELECT 1
-                            FROM AULAS
-                            WHERE ID_USUARIO = ?
-                              AND ((SEGUNDA = 1 AND ? = 1) OR
-                                    (TERCA   = 1 AND ?   = 1) OR
-                                    (QUARTA  = 1 AND ?  = 1) OR
-                                    (QUINTA  = 1 AND ?  = 1) OR
-                                    (SEXTA   = 1 AND ?   = 1) OR
-                                    (SABADO  = 1 AND ?  = 1))
-                              AND ((? BETWEEN HORA AND HORA_FIM)
-                                    OR (HORA BETWEEN ? AND ?)
-                                    OR (? BETWEEN HORA AND HORA_FIM));0
-                            """,
-                           (id_usuario, segunda, terca,
-                            quarta, quinta, sexta, sabado,
-                            hora, hora, hora_fim, hora_fim))
+            cursor.execute("""
+                SELECT 1
+                FROM AULAS
+                WHERE ID_USUARIO = ?
+                  AND (
+                        (SEGUNDA = 1 AND ? = 1) OR
+                        (TERCA   = 1 AND ? = 1) OR
+                        (QUARTA  = 1 AND ? = 1) OR
+                        (QUINTA  = 1 AND ? = 1) OR
+                        (SEXTA   = 1 AND ? = 1)
+                      )
+            """, (id_usuario, segunda, terca, quarta, quinta, sexta))
             if cursor.fetchone():  # Verifica se a consulta retornou algum resultado
                 flash('Esse horário já está ocupado!', 'error')
                 return redirect(url_for('cadastroaula'))
@@ -949,91 +980,185 @@ def deletar(id):
 
     return redirect(url_for('abrir_tabelamodalidade'))
 
-# -------------------------------------------------------
-# UPLOAD IMAGEM
-# -------------------------------------------------------
-@app.route('/uploads/<nome_arquivo>')
-def imagem(nome_arquivo):
-    print('aqui3')
-    return send_from_directory('static/uploads', nome_arquivo)
 
 # -------------------------------------------------------
 # ABRIR TABELA AULAS ALUNO
 # -------------------------------------------------------
-@app.route('/abrir_tabelaaulasalunos/<int:id>')
-def abrir_tabelaaulasalunos(id):
+@app.route('/abrir_tabelaaulasalunos')
+def abrir_tabelaaulasalunos():
     if 'id_usuario' not in session:
         return redirect(url_for('login'))
 
-
-    cursor = con.cursor()
-
+    cursor= con.cursor()
     try:
-        cursor.execute(""" SELECT ID_USUARIO FROM USUARIO WHERE ID_USUARIO= ? """, (id,))
         cursor.execute("""SELECT a.id_aulas
-                                 , u.nome AS professor
-                                 , m.nome AS modalidade
-                                 , a.capacidade
-                                 , a.hora
-                                 , a.hora_fim
-                                 , CASE a.segunda WHEN 1 THEN 'Seg ' ELSE '' END ||
-                                   CASE a.terca   WHEN 1 THEN 'Ter ' ELSE '' END ||
-                                   CASE a.quarta  WHEN 1 THEN 'Qua ' ELSE '' END ||
-                                   CASE a.quinta  WHEN 1 THEN 'Qui ' ELSE '' END ||
-                                   CASE a.sexta   WHEN 1 THEN 'Sex ' ELSE '' END ||
-                                   CASE a.sabado  WHEN 1 THEN 'Sab ' ELSE '' END AS dias_semana
-                          FROM aulas a
-                          INNER JOIN usuario u ON a.id_usuario = u.id_usuario
-                          INNER JOIN modalidade m ON a.id_modalidade = m.id_modalidade
-                       """)
+                                         , u.nome AS professor
+                                         , m.nome AS modalidade
+                                         , a.capacidade
+                                         , a.hora
+                                         , a.hora_fim
+                                         , CASE a.segunda WHEN 1 THEN 'Seg ' ELSE '' END ||
+                                           CASE a.terca   WHEN 1 THEN 'Ter ' ELSE '' END ||
+                                           CASE a.quarta  WHEN 1 THEN 'Qua ' ELSE '' END ||
+                                           CASE a.quinta  WHEN 1 THEN 'Qui ' ELSE '' END ||
+                                           CASE a.sexta   WHEN 1 THEN 'Sex ' ELSE '' END ||
+                                           CASE a.sabado  WHEN 1 THEN 'Sab ' ELSE '' END AS dias_semana 
+                                        , a.CAPACIDADE ||'/' ||(SELECT count(*) FROM AULAS_ALUNO aa 
+                                           WHERE aa.ID_AULAS  = a.id_aulas) AS capacidade_ocupacao
+                                    
+                                  FROM aulas a
+                                  INNER JOIN usuario u ON a.id_usuario = u.id_usuario
+                                  INNER JOIN modalidade m ON a.id_modalidade = m.id_modalidade
+                                  WHERE a.CAPACIDADE > (SELECT count(*) FROM AULAS_ALUNO aa 
+                                                         WHERE aa.ID_AULAS  = a.id_aulas) 
+                               """)
         aulas = cursor.fetchall()
+        print(aulas)
     finally:
         cursor.close()
-
-    return render_template('tabelaAulas.html', aulas=aulas, id=id)
-
-
-
+    return render_template('tabelaAulas.html', aulas=aulas)
 
 
 # -------------------------------------------------------
 # Inscreva-se
 # -------------------------------------------------------
-@app.route('/inscrever')
-def inscrever():
+# @app.route('/inscrever/<int:id>', methods=['GET', 'POST'])
+# def inscrever(id):
+#     if 'id_usuario' not in session:
+#         return redirect(url_for('login'))
+#     cursor = con.cursor()
+#     id_usuario = session['id_usuario']
+#     print(id_usuario)
+#     try:
+#         cursor.execute("""
+#             SELECT 1
+#             FROM AULAS_ALUNO aa
+#             INNER JOIN AULAS a ON a.ID_AULAS = aa.ID_AULAS
+#             WHERE aa.ID_USUARIO = ?   -- aluno
+#               AND (
+#                     (a.SEGUNDA = 1 AND ? = 1) OR
+#                     (a.TERCA   = 1 AND ? = 1) OR
+#                     (a.QUARTA  = 1 AND ? = 1) OR
+#                     (a.QUINTA  = 1 AND ? = 1) OR
+#                     (a.SEXTA   = 1 AND ? = 1) OR
+#                     (a.SABADO  = 1 AND ? = 1)
+#                   )
+#               AND (
+#                     (? BETWEEN a.HORA AND a.HORA_FIM)
+#                  OR (a.HORA BETWEEN ? AND ?)
+#                  OR (? BETWEEN a.HORA AND a.HORA_FIM)
+#                   )
+#         """,(id_usuario,))
+#         print(cursor.fetchone())
+#         # Se houver pelo menos um resultado, já existe conflito
+#         if cursor.fetchone():
+#             flash('Esse aluno já tem uma aula nesse horário!', 'error')
+#             return redirect(url_for('abrir_tabelaaulasalunos'))
+#
+#         cursor.execute(# COLOCAR ID_AULA, ID_USUARIO
+#             "INSERT INTO aulas_aluno (id_aulas, id_usuarios, situacao) VALUES (?,?,?)",
+#             (id, id_usuario, 0,)
+#         )
+#         print('vou comitar')
+#         con.commit()
+#     finally:
+#         cursor.close()
+#         return redirect(url_for('abrir_dashbordaluno', id=id_usuario))
+
+
+@app.route('/inscrever/<int:id>', methods=['GET', 'POST'])
+def inscrever(id):
     if 'id_usuario' not in session:
         return redirect(url_for('login'))
+
+    id_usuario = session['id_usuario']
     cursor = con.cursor()
-        try:
-            cursor.execute("""
-                SELECT 1
-                FROM AULAS_ALUNO aa
-                INNER JOIN AULAS a ON a.ID_AULAS = aa.ID_AULAS
-                WHERE aa.ID_USUARIO = ?   -- aluno
-                  AND (
-                        (a.SEGUNDA = 1 AND ? = 1) OR
-                        (a.TERCA   = 1 AND ? = 1) OR
-                        (a.QUARTA  = 1 AND ? = 1) OR
-                        (a.QUINTA  = 1 AND ? = 1) OR
-                        (a.SEXTA   = 1 AND ? = 1) OR
-                        (a.SABADO  = 1 AND ? = 1)
-                      )
-                  AND (
-                        (? BETWEEN a.HORA AND a.HORA_FIM)
-                     OR (a.HORA BETWEEN ? AND ?)
-                     OR (? BETWEEN a.HORA AND a.HORA_FIM)
-                      );
-            """, (
-                    id_usuario, segunda, terca, quarta, quinta, sexta, sabado, hora, hora, hora_fim,hora_fim
-                ))
 
-            # Se houver pelo menos um resultado, já existe conflito
-            if cursor.fetchone():
-                flash('Esse aluno já tem uma aula nesse horário!', 'error')
-                return redirect(url_for('cadastroaula'))
-        finally:
+    try:
+        # Pegar dados da nova aula
+        cursor.execute("""
+            SELECT HORA, HORA_FIM, SEGUNDA, TERCA, QUARTA, QUINTA, SEXTA, SABADO
+            FROM AULAS
+            WHERE ID_AULAS = ?
+        """, (id,))
+        nova_aula = cursor.fetchone()
 
+        if not nova_aula:
+            flash('Aula não encontrada.', 'error')
+            return redirect(url_for('abrir_tabelaaulasalunos'))
 
+        hora_inicio, hora_fim, segunda, terca, quarta, quinta, sexta, sabado = nova_aula
+
+        # Verificar conflito de horário
+        cursor.execute("""
+            SELECT 1
+            FROM AULAS_ALUNO aa
+            INNER JOIN AULAS a ON a.ID_AULAS = aa.ID_AULAS
+            WHERE aa.ID_USUARIO = ?
+              AND (
+                    (a.SEGUNDA = 1 AND ? = 1) OR
+                    (a.TERCA   = 1 AND ? = 1) OR
+                    (a.QUARTA  = 1 AND ? = 1) OR
+                    (a.QUINTA  = 1 AND ? = 1) OR
+                    (a.SEXTA   = 1 AND ? = 1) OR
+                    (a.SABADO  = 1 AND ? = 1)
+                  )
+              AND (
+                    (? BETWEEN a.HORA AND a.HORA_FIM)
+                 OR (a.HORA BETWEEN ? AND ?)
+                 OR (? BETWEEN a.HORA AND a.HORA_FIM)
+                  )
+        """, (
+            id_usuario,
+            segunda, terca, quarta, quinta, sexta, sabado,
+            hora_inicio, hora_inicio, hora_fim, hora_fim
+        ))
+
+        conflito = cursor.fetchone()
+
+        if conflito:
+            flash('Esse aluno já tem uma aula nesse horário!', 'error')
+            return redirect(url_for('abrir_tabelaaulasalunos'))
+
+        # Fazer inscrição
+        cursor.execute("""
+            INSERT INTO AULAS_ALUNO (ID_AULAS, ID_USUARIO, SITUACAO)
+            VALUES (?, ?, 0)
+        """, (id, id_usuario))
+        con.commit()
+
+        flash('Inscrição realizada com sucesso!', 'success')
+
+        # Contar alunos inscritos e comparar com a capacidade
+        cursor.execute("""
+                SELECT COUNT(*)
+                FROM AULAS_ALUNO
+                WHERE ID_AULAS = ?
+                  AND SITUACAO = 0
+            """, (id,))
+        inscritos = cursor.fetchone()[0]
+        print(inscritos)
+
+        cursor.execute("SELECT CAPACIDADE FROM AULAS WHERE ID_AULAS = ?", (id,))
+        capacidade_total = cursor.fetchone()[0]
+        print(capacidade_total)
+
+        capacidade = f"{inscritos}/{capacidade_total}"
+        print(capacidade)
+
+    except Exception as e:
+        con.rollback()
+        flash(f'Erro ao inscrever: {e}', 'error')
+
+    finally:
+        cursor.close()
+
+    return redirect(url_for('abrir_dashbordaluno', id=id_usuario, capacidade=capacidade))
+
+# -------------------------------------------------------
+# Relatório de vagas q sobram
+# -------------------------------------------------------
+#
 # -------------------------------------------------------
 # EXECUÇÃO DA APLICAÇÃO
 # -------------------------------------------------------
