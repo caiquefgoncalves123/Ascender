@@ -40,6 +40,7 @@
     <table class="tabela-aulas">
       <thead>
         <tr>
+          <th>Foto</th>
           <th>Nome</th>
           <th>Email</th>
           <th>Telefone</th>
@@ -52,7 +53,10 @@
             <tbody>
         {% for professor in professor %}
         <tr>
-          <td data-label="Nome">{{ professor[1] }}</td> <!-- nome -->
+          <td class="perfi"><img style="border-radius:100%; height: 70px; width: 70px "  class="perpro" width="100" src="../static/uploads/foto{{ professor[0] }}.jpg" /></td>
+          <td data-label="Nome">
+            {{ professor[1] }}
+          </td> <!-- nome -->
           <td data-label="Email">{{ professor[2] }}</td> <!-- email -->
           <td data-label="Telefone">{{ professor[3] }}</td> <!-- telefone -->
           <td data-label="CPF">{{ professor[4] }}</td> <!-- cpf -->
