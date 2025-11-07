@@ -24,7 +24,17 @@
       <h1>Ascender</h1>
       <p>Academia Completa para Corpo e Mente – Treinos, Aulas, Nutrição e Bem-Estar.</p>
       <div class="hero-buttons">
-        <a href="{{ url_for('login') }}" class="btn-primary">Acessar</a>
+          {% if 'id_usuario' in session %}
+            {% if session['usuario'][5] == 0 %}
+              <a href="{{ url_for('abrir_dashbordadm', id=session['id_usuario']) }}" class="btn-primary">Acessar</a>
+            {% elif session['usuario'][5] == 2 %}
+              <a href="{{ url_for('abrir_dashbordaluno', id=session['id_usuario']) }}" class="btn-primary">Acessar</a>
+            {% else %}
+              <a href="{{ url_for('login') }}" class="btn-primary">Acessar</a>
+            {% endif %}
+          {% else %}
+            <a href="{{ url_for('login') }}" class="btn-primary">Acessar</a>
+          {% endif %}
         <a href="{{ url_for('cadastro') }}" class="btn-secondary">Quero conhecer</a>
       </div>
     </div>

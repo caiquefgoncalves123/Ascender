@@ -69,18 +69,21 @@
                                 </div>
                            </div>
 
-                           <div class="relatorio">
-                            <h2>Relatório</h2>
+                            <div class="relatorio">
+                              <h2>Relatórios</h2>
 
-                            <div class="caixa1">
-                                <h3>Inscritos por Aula</h3>
-                                <p>Baixar</p>
+                              <!-- Relatório de Aulas Esgotadas -->
+                              <div class="caixa1">
+                                <h3>Aulas Esgotadas</h3>
+                                <a href="{{ url_for('relatorio_aulas_esgotadas') }}" class="btn-baixar">Baixar</a>
+                              </div>
+
+                              <!-- Relatório de Aulas com Vagas Disponíveis -->
+                              <div class="caixa1">
+                                <h3>Aulas com Vagas Disponíveis</h3>
+                                <a href="{{ url_for('relatorio_aulas_disponiveis') }}" class="btn-baixar">Baixar</a>
+                              </div>
                             </div>
-                            <div class="caixa1">
-                                <h3>Ocupação por Turmas</h3>
-                                <p>Baixar</p>
-                            </div>
-                           </div>
             </div>
         </section>
     </main>

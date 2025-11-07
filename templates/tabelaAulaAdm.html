@@ -5,11 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Painel - Tabela de Aulas</title>
   <link rel="stylesheet" href="../static/style/style.css" />
-  <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&family=Poppins:wght@500;600;700&display=swap" rel="stylesheet" />
 </head>
 <body>
-  <!-- Header -->
   <header>
     <div class="logo">
       <img src="../static/img/logo-ascender.jpg" alt="Ascender Logo" />
@@ -20,24 +18,22 @@
     </nav>
   </header>
 
-  <!-- Mensagens flash -->
   {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                <div class="flash-messages">
-                    {% for category, message in messages %}
-                        <div class="flash {{ category }}">
-                            <span class="close-btn" onclick="this.parentElement.style.display='none';">&times;</span>
-                            {{ message }}
-                        </div>
-                    {% endfor %}
-                </div>
-            {% endif %}
-        {% endwith %}
+    {% if messages %}
+      <div class="flash-messages">
+        {% for category, message in messages %}
+          <div class="flash {{ category }}">
+            <span class="close-btn" onclick="this.parentElement.style.display='none';">&times;</span>
+            {{ message }}
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+  {% endwith %}
 
-  <!-- Conteúdo -->
   <main class="dashboard">
     <h2 class="titulo-tabela">TABELA DE AULAS</h2>
-    <a class="cadasau" href="{{ url_for('cadastroaula') }}"> Cadastrar aula</a>
+    <a class="cadasau" href="{{ url_for('cadastroaula') }}">Cadastrar aula</a>
 
     <table class="tabela-aulas">
       <thead>
@@ -48,7 +44,6 @@
           <th>Horário início</th>
           <th>Horário fim</th>
           <th>Capacidade</th>
-<!--          <th>Ações</th>-->
         </tr>
       </thead>
       <tbody>
@@ -57,16 +52,15 @@
           <td data-label="Modalidade">{{ aula[2] }}</td>
           <td data-label="Professor">{{ aula[1] }}</td>
           <td data-label="Dias">{{ aula[6] }}</td>
-          <td data-label="Horário início">{{ aula[4] }} </td>
+          <td data-label="Horário início">{{ aula[4] }}</td>
           <td data-label="Horário fim">{{ aula[5] }}</td>
-          <td data-label="Capacidade">{{ aula[3] }}</td>
+          <td data-label="Capacidade">{{ aula[7] }}</td> <!-- capacidade total/ocupada -->
         </tr>
         {% endfor %}
       </tbody>
     </table>
   </main>
 
-  <!-- Footer -->
   <footer class="rodape">
     <div class="conteudo-rodape">
       <div class="coluna-esquerda">

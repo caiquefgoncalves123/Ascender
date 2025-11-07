@@ -5,7 +5,7 @@
   <meta charset="UTF-8">
   <title>Dashboard - Aluno</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href=  "../static/style/style.css">
+  <link rel="stylesheet" href="../static/style/style.css">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&family=Poppins:wght@500;600;700&display=swap"
     rel="stylesheet">
 </head>
@@ -21,52 +21,74 @@
     <!-- Navegação -->
     <nav>
       <a href="{{ url_for('index') }}">Sobre</a>
-      <a href="{{ url_for('logout') }}" >Logout</a>
+      <a href="{{ url_for('logout') }}">Logout</a>
     </nav>
   </header>
-       {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                <div class="flash-messages">
-                    {% for category, message in messages %}
-                        <div class="flash {{ category }}">
-                            <span class="close-btn" onclick="this.parentElement.style.display='none';">&times;</span>
-                            {{ message }}
-                        </div>
-                    {% endfor %}
-                </div>
-            {% endif %}
-        {% endwith %}
 
+  <!-- ===== FLASH MESSAGES ===== -->
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      <div class="flash-messages">
+        {% for category, message in messages %}
+          <div class="flash {{ category }}">
+            <span class="close-btn" onclick="this.parentElement.style.display='none';">&times;</span>
+            {{ message }}
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+  {% endwith %}
 
   <!-- ===== MAIN ===== -->
   <main class="dashboard">
-    <h1>Olá, {{ usuario[1] }}!</h1>
+
+    <h1 style="padding-bottom: 60px;">Olá, {{ usuario[1] }}!</h1>
+
+
+     <h2 style="align-self:center;">Minhas aulas</h2>
+        <!-- Link para tabela de aulas -->
+    <a style="align-self:center;" class="btn-inscrever" href="{{ url_for('abrir_tabelaaulasalunos') }}">Inscreva-se em novas aulas</a>
+
+
 
     <!-- Caixa principal -->
     <section class="admcaixa">
       <div class="caixa">
-        <!-- Bloco de aulas do aluno -->
-        <div class="exclui">
-          <h2>Minhas aulas</h2>
-          <a href="{{ url_for('abrir_tabelaaulasalunos', id=usuario[0]) }}">Inscreva-se</a>
 
-          <div id="caixaa" class="caixa1">
-            <h3 id="spin">Spinning</h3>
-            <p>12/09 - 19h</p>
-            <a onclick="excluir(event)" href="">Excluir inscrição</a>
+        <!-- Cards dinâmicos das aulas inscritas -->
+        {% if aulas_inscritas %}
+          {% for aula in aulas_inscritas %}
+        <div class="caixass">
+            <div class="caixa1">
+              <h3>{{ aula[1] }}</h3> <!-- Nome da modalidade -->
+              <p><strong>Professor:</strong> {{ aula[2] }}</p>
+              <p><strong>Dias:</strong> {{ aula[5] }}</p>
+              <p><strong>Horário:</strong> {{ aula[3] }} - {{ aula[4] }}</p>
+
+              <form method="POST" action="{{ url_for('inscrever', id=aula[0]) }}">
+                <input type="hidden" name="inscricao" value="1">
+                <button type="submit" class="btn cancelar" style="background-color: #D74B4B;">
+                  Cancelar inscrição
+                </button>
+              </form>
+            </div>
           </div>
+           {% endfor %}
+        {% else %}
+          <p>Você ainda não está inscrito em nenhuma aula.</p>
+        {% endif %}
+
         </div>
-      </div>
     </section>
 
     <!-- Botão de editar perfil -->
-    <div>
-        <a href=" {{ url_for('editar_usuario', id=usuario[0]) }}">Editar perfil</a>
+    <div class="editar-perfil">
+      <a href="{{ url_for('editar_usuario', id=usuario[0]) }}">Editar perfil</a>
     </div>
   </main>
 
-    <script src="../static/js/script.js"></script>
-</body>
+  <script src="../static/js/script.js"></script>
+
   <!-- ===== FOOTER ===== -->
   <footer class="rodape">
     <div class="conteudo-rodape">
@@ -83,4 +105,5 @@
       </div>
     </div>
   </footer>
+</body>
 </html>

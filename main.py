@@ -1,4 +1,5 @@
 from flask import Flask, render_template, redirect, request, flash, url_for, session, send_from_directory, send_file
+from datetime import datetime
 import fdb  # Biblioteca para conexão com banco de dados Firebird
 from flask_bcrypt import generate_password_hash, check_password_hash  # Criptografia de senhas
 from fpdf import FPDF  # Geração de arquivos PDF (não utilizada neste código)
@@ -65,10 +66,31 @@ def abrir_dashbordaluno(id):
         return redirect(url_for('login'))
 
     cursor = con.cursor()
-    cursor.execute('select id_usuario, nome, email, telefone, cpf from usuario where id_usuario = ?', (id,))
+    cursor.execute('SELECT id_usuario, nome, email, telefone, cpf FROM usuario WHERE id_usuario = ?', (id,))
     usuario = cursor.fetchone()
 
-    return render_template('dashboardaluno.html', usuario=usuario)
+    # Buscar aulas em que o aluno está inscrito
+    cursor.execute("""
+        SELECT a.id_aulas, m.nome AS modalidade, u.nome AS professor, 
+               a.hora, a.hora_fim,
+               CASE a.segunda WHEN 1 THEN 'Seg ' ELSE '' END ||
+               CASE a.terca WHEN 1 THEN 'Ter ' ELSE '' END ||
+               CASE a.quarta WHEN 1 THEN 'Qua ' ELSE '' END ||
+               CASE a.quinta WHEN 1 THEN 'Qui ' ELSE '' END ||
+               CASE a.sexta WHEN 1 THEN 'Sex ' ELSE '' END ||
+               CASE a.sabado WHEN 1 THEN 'Sab ' ELSE '' END AS dias_semana
+        FROM aulas a
+        INNER JOIN usuario u ON a.id_usuario = u.id_usuario
+        INNER JOIN modalidade m ON a.id_modalidade = m.id_modalidade
+        INNER JOIN AULAS_ALUNO aa ON aa.ID_AULAS = a.ID_AULAS
+        WHERE aa.ID_USUARIO = ? AND aa.SITUACAO = 0
+    """, (id,))
+    aulas_inscritas = cursor.fetchall()
+
+    cursor.close()
+
+    return render_template('dashboardaluno.html', usuario=usuario, aulas_inscritas=aulas_inscritas)
+
 
 
 # -------------------------------------------------------
@@ -501,49 +523,33 @@ def abrir_tabelaaulasadm():
             flash('Acesso negado, você não é Administrador!')
             return redirect(url_for('login'))
 
+        cursor.execute("""
+            SELECT 
+                a.id_aulas,
+                u.nome AS professor,
+                m.nome AS modalidade,
+                a.capacidade,
+                a.hora,
+                a.hora_fim,
+                CASE a.segunda WHEN 1 THEN 'Seg ' ELSE '' END ||
+                CASE a.terca WHEN 1 THEN 'Ter ' ELSE '' END ||
+                CASE a.quarta WHEN 1 THEN 'Qua ' ELSE '' END ||
+                CASE a.quinta WHEN 1 THEN 'Qui ' ELSE '' END ||
+                CASE a.sexta WHEN 1 THEN 'Sex ' ELSE '' END ||
+                CASE a.sabado WHEN 1 THEN 'Sab ' ELSE '' END AS dias_semana,
 
-        cursor.execute("""SELECT a.id_aulas
-                                  , u.nome AS professor
-                                  , m.nome AS modalidade
-                                  , a.capacidade
-                                  , a.hora
-                                  , a.hora_fim
-                                  
-                                 , CASE a.segunda
-                                     WHEN 1 THEN 'Seg '
-                                    ELSE '' 
-                                    END  ||
-                                    
-                                       CASE a.terca
-                                     WHEN 1 THEN 'Ter '
-                                    ELSE '' 
-                                    END ||
-                                    
-                                              CASE a.quarta
-                                     WHEN 1 THEN 'Qua '
-                                    ELSE '' 
-                                    END ||  
-                                    
-                                   CASE a.quinta
-                                     WHEN 1 THEN 'Qui '
-                                    ELSE '' 
-                                    END ||
-                                    
-                                       CASE a.sexta
-                                     WHEN 1 THEN 'Sex '
-                                    ELSE '' 
-                                    END ||
-                                
-                                    
-                                   CASE a.sabado
-                                     WHEN 1 THEN 'Sab '
-                                    ELSE '' 
-                                    END AS dias_semana
-                                     
-                            FROM aulas a
-                            INNER JOIN usuario u ON a.id_usuario = u.id_usuario
-                            INNER JOIN modalidade m ON a.id_modalidade = m.id_modalidade
-                        """)
+                a.capacidade || '/' || (
+                    SELECT COUNT(*) 
+                    FROM AULAS_ALUNO aa 
+                    WHERE aa.ID_AULAS = a.id_aulas
+                    AND aa.situacao = 0
+                ) AS capacidade_ocupacao
+
+            FROM aulas a
+            INNER JOIN usuario u ON a.id_usuario = u.id_usuario
+            INNER JOIN modalidade m ON a.id_modalidade = m.id_modalidade
+        """)
+
         aulas = cursor.fetchall()
     finally:
         cursor.close()
@@ -994,39 +1000,53 @@ def abrir_tabelaaulasalunos():
         return redirect(url_for('login'))
 
     id_usuario = session['id_usuario']
-
     cursor = con.cursor()
+
     try:
         cursor.execute(""" 
-                                    SELECT a.id_aulas
-                                         , u.nome AS professor
-                                         , m.nome AS modalidade
-                                         , a.capacidade
-                                         , a.hora
-                                         , a.hora_fim
-                                         , CASE a.segunda WHEN 1 THEN 'Seg ' ELSE '' END ||
-                                           CASE a.terca   WHEN 1 THEN 'Ter ' ELSE '' END ||
-                                           CASE a.quarta  WHEN 1 THEN 'Qua ' ELSE '' END ||
-                                           CASE a.quinta  WHEN 1 THEN 'Qui ' ELSE '' END ||
-                                           CASE a.sexta   WHEN 1 THEN 'Sex ' ELSE '' END ||
-                                           CASE a.sabado  WHEN 1 THEN 'Sab ' ELSE '' END AS dias_semana 
-                                        , a.CAPACIDADE ||'/' ||(SELECT count(*) FROM AULAS_ALUNO aa 
-                                           WHERE aa.ID_AULAS  = a.id_aulas
-                                           and aa.situacao = 0) AS capacidade_ocupacao
-                                        , COALESCE((SELECT aa.SITUACAO  
-                                                      FROM AULAS_ALUNO AA 
-                                                     WHERE AA.ID_AULAS = A.ID_AULAS
-                                                       AND AA.ID_USUARIO = ?),1) AS SITUACAO          
-                                  FROM aulas a
-                                  INNER JOIN usuario u ON a.id_usuario = u.id_usuario
-                                  INNER JOIN modalidade m ON a.id_modalidade = m.id_modalidade
-                                  WHERE a.CAPACIDADE > (SELECT count(*) FROM AULAS_ALUNO aa 
-                                                         WHERE aa.ID_AULAS  = a.id_aulas
-                                                         and aa.situacao = 0) 
-                               """, (id_usuario,))
+            SELECT 
+                a.id_aulas,
+                u.nome AS professor,
+                m.nome AS modalidade,
+                a.capacidade,
+                a.hora,
+                a.hora_fim,
+                CASE a.segunda WHEN 1 THEN 'Seg ' ELSE '' END ||
+                CASE a.terca   WHEN 1 THEN 'Ter ' ELSE '' END ||
+                CASE a.quarta  WHEN 1 THEN 'Qua ' ELSE '' END ||
+                CASE a.quinta  WHEN 1 THEN 'Qui ' ELSE '' END ||
+                CASE a.sexta   WHEN 1 THEN 'Sex ' ELSE '' END ||
+                CASE a.sabado  WHEN 1 THEN 'Sab ' ELSE '' END AS dias_semana,
+                a.CAPACIDADE || '/' || (
+                    SELECT COUNT(*) 
+                    FROM AULAS_ALUNO aa 
+                    WHERE aa.ID_AULAS = a.id_aulas
+                    AND aa.situacao = 0
+                ) AS capacidade_ocupacao,
+                1 AS SITUACAO
+            FROM aulas a
+            INNER JOIN usuario u ON a.id_usuario = u.id_usuario
+            INNER JOIN modalidade m ON a.id_modalidade = m.id_modalidade
+            WHERE 
+                a.capacidade > (
+                    SELECT COUNT(*) 
+                    FROM AULAS_ALUNO aa 
+                    WHERE aa.ID_AULAS = a.id_aulas
+                    AND aa.situacao = 0
+                )
+                AND NOT EXISTS (
+                    SELECT 1 
+                    FROM AULAS_ALUNO aa2
+                    WHERE aa2.ID_USUARIO = ?
+                    AND aa2.ID_AULAS = a.id_aulas
+                    AND aa2.SITUACAO = 0
+                )
+        """, (id_usuario,))
+
         aulas = cursor.fetchall()
     finally:
         cursor.close()
+
     return render_template('tabelaAulas.html', aulas=aulas)
 
 
@@ -1309,8 +1329,157 @@ def inscrever(id):
     return redirect(url_for('abrir_dashbordaluno', id=id_usuario))
 
 # -------------------------------------------------------
-# Relatório de vagas q sobram
+# aulas que ja estão esgotadas. /relatorio_aulas_esgotadas
 # -------------------------------------------------------
+
+@app.route('/relatorio_aulas_esgotadas', methods=['GET'])
+def relatorio_aulas_esgotadas():
+    if 'id_usuario' not in session:
+        return redirect(url_for('login'))
+
+    cursor = con.cursor()
+    try:
+        cursor.execute("""
+            SELECT 
+                a.id_aulas,
+                u.nome AS professor,
+                m.nome AS modalidade,
+                a.capacidade,
+                (SELECT COUNT(*) FROM AULAS_ALUNO aa WHERE aa.ID_AULAS = a.id_aulas) AS alunos_inscritos,
+                a.hora, a.hora_fim,
+                CASE a.segunda WHEN 1 THEN 'Seg ' ELSE '' END ||
+                CASE a.terca   WHEN 1 THEN 'Ter ' ELSE '' END ||
+                CASE a.quarta  WHEN 1 THEN 'Qua ' ELSE '' END ||
+                CASE a.quinta  WHEN 1 THEN 'Qui ' ELSE '' END ||
+                CASE a.sexta   WHEN 1 THEN 'Sex ' ELSE '' END ||
+                CASE a.sabado  WHEN 1 THEN 'Sab ' ELSE '' END AS dias_semana
+            FROM aulas a
+            INNER JOIN usuario u ON a.id_usuario = u.id_usuario
+            INNER JOIN modalidade m ON a.id_modalidade = m.id_modalidade
+            WHERE a.capacidade <= (SELECT COUNT(*) FROM AULAS_ALUNO aa WHERE aa.ID_AULAS = a.id_aulas)
+            ORDER BY m.nome, a.hora
+        """)
+        aulas = cursor.fetchall()
+
+        pdf = FPDF()
+        pdf.add_page()
+        pdf.set_font("Arial", 'B', 14)
+        pdf.cell(200, 10, "Relatório de Aulas Esgotadas", ln=True, align="C")
+        pdf.set_font("Arial", size=10)
+        pdf.cell(200, 10, f"Gerado em: {datetime.now().strftime('%d/%m/%Y %H:%M')}", ln=True)
+        pdf.ln(5)
+
+        # Cabeçalho da tabela (sempre exibido)
+        pdf.set_font("Arial", 'B', 10)
+        pdf.cell(15, 8, "ID", 1)
+        pdf.cell(50, 8, "Modalidade", 1)
+        pdf.cell(40, 8, "Professor", 1)
+        pdf.cell(25, 8, "Dias", 1)
+        pdf.cell(30, 8, "Horário", 1)
+        pdf.cell(25, 8, "Vagas", 1, ln=True)
+
+        pdf.set_font("Arial", size=9)
+
+        if not aulas:
+            # Exibe linha informando que não há registros
+            pdf.cell(185, 8, "Nenhuma aula está esgotada no momento.", 1, ln=True, align="C")
+        else:
+            for a in aulas:
+                id_aula, professor, modalidade, capacidade, inscritos, hora, hora_fim, dias = a
+                vagas_restantes = capacidade - inscritos  # sempre 0 ou negativo
+                pdf.cell(15, 8, str(id_aula), 1)
+                pdf.cell(50, 8, modalidade[:20], 1)
+                pdf.cell(40, 8, professor[:20], 1)
+                pdf.cell(25, 8, dias.strip(), 1)
+                pdf.cell(30, 8, f"{hora}-{hora_fim}", 1)
+                pdf.cell(25, 8, str(0 if vagas_restantes < 0 else vagas_restantes), 1, ln=True)
+
+        nome_arquivo = "relatorio_aulas_esgotadas.pdf"
+        pdf.output(nome_arquivo)
+        return send_file(nome_arquivo, as_attachment=True, mimetype='application/pdf')
+
+    except Exception as e:
+        flash(f"Erro ao gerar relatório: {e}", "error")
+        return redirect(url_for('abrir_tabelaaulasadm'))
+    finally:
+        cursor.close()
+
+
+
+
+# -------------------------------------------------------
+# aulas que ainda restam vagas relatorio_aulas_disponiveis
+# -------------------------------------------------------
+
+
+@app.route('/relatorio_aulas_disponiveis', methods=['GET'])
+def relatorio_aulas_disponiveis():
+    if 'id_usuario' not in session:
+        return redirect(url_for('login'))
+
+    cursor = con.cursor()
+    try:
+        cursor.execute("""
+            SELECT 
+                a.id_aulas,
+                u.nome AS professor,
+                m.nome AS modalidade,
+                a.capacidade,
+                (SELECT COUNT(*) FROM AULAS_ALUNO aa WHERE aa.ID_AULAS = a.id_aulas) AS alunos_inscritos,
+                a.hora, a.hora_fim,
+                CASE a.segunda WHEN 1 THEN 'Seg ' ELSE '' END ||
+                CASE a.terca   WHEN 1 THEN 'Ter ' ELSE '' END ||
+                CASE a.quarta  WHEN 1 THEN 'Qua ' ELSE '' END ||
+                CASE a.quinta  WHEN 1 THEN 'Qui ' ELSE '' END ||
+                CASE a.sexta   WHEN 1 THEN 'Sex ' ELSE '' END ||
+                CASE a.sabado  WHEN 1 THEN 'Sab ' ELSE '' END AS dias_semana
+            FROM aulas a
+            INNER JOIN usuario u ON a.id_usuario = u.id_usuario
+            INNER JOIN modalidade m ON a.id_modalidade = m.id_modalidade
+            WHERE a.capacidade > (SELECT COUNT(*) FROM AULAS_ALUNO aa WHERE aa.ID_AULAS = a.id_aulas)
+            ORDER BY m.nome, a.hora
+        """)
+        aulas = cursor.fetchall()
+
+        pdf = FPDF()
+        pdf.add_page()
+        pdf.set_font("Arial", 'B', 14)
+        pdf.cell(200, 10, "Relatório de Aulas com Vagas Disponíveis", ln=True, align="C")
+        pdf.set_font("Arial", size=10)
+        pdf.cell(200, 10, f"Gerado em: {datetime.now().strftime('%d/%m/%Y %H:%M')}", ln=True)
+        pdf.ln(5)
+
+        if not aulas:
+            pdf.cell(200, 10, "Todas as aulas estão esgotadas no momento.", ln=True)
+        else:
+            pdf.set_font("Arial", 'B', 10)
+            pdf.cell(15, 8, "ID", 1)
+            pdf.cell(50, 8, "Modalidade", 1)
+            pdf.cell(40, 8, "Professor", 1)
+            pdf.cell(25, 8, "Dias", 1)
+            pdf.cell(30, 8, "Horário", 1)
+            pdf.cell(25, 8, "Vagas", 1, ln=True)
+
+            pdf.set_font("Arial", size=9)
+            for a in aulas:
+                id_aula, professor, modalidade, capacidade, inscritos, hora, hora_fim, dias = a
+                vagas_restantes = capacidade - inscritos
+                pdf.cell(15, 8, str(id_aula), 1)
+                pdf.cell(50, 8, modalidade[:20], 1)
+                pdf.cell(40, 8, professor[:20], 1)
+                pdf.cell(25, 8, dias.strip(), 1)
+                pdf.cell(30, 8, f"{hora}-{hora_fim}", 1)
+                pdf.cell(25, 8, str(vagas_restantes), 1, ln=True)
+
+        nome_arquivo = "relatorio_aulas_disponiveis.pdf"
+        pdf.output(nome_arquivo)
+        return send_file(nome_arquivo, as_attachment=True, mimetype='application/pdf')
+
+    except Exception as e:
+        flash(f"Erro ao gerar relatório: {e}", "error")
+        return redirect(url_for('abrir_tabelaaulasadm'))
+    finally:
+        cursor.close()
 
 
 
