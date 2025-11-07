@@ -350,7 +350,7 @@ def situacao_aula(id):
     finally:
         cursor.close()
 
-    return redirect(url_for('abrir_tabelaaulas'))
+    return redirect(url_for('abrir_tabelaaulasalunos'))
 
 
 # -------------------------------------------------------
@@ -405,6 +405,7 @@ def abrir_tabelaaulas():
     try:
         cursor.execute("SELECT id_usuario FROM usuario WHERE id_usuario = ?", (session['id_usuario'],))
 
+
         cursor.execute("""SELECT a.id_aulas
                                      , u.nome AS professor
                                      , m.nome AS modalidade
@@ -441,6 +442,9 @@ def abrir_tabelaaulas():
                                INNER JOIN modalidade m ON a.id_modalidade = m.id_modalidade
                            """)
         aulas = cursor.fetchall()
+
+
+
     finally:
         cursor.close()
 
@@ -989,9 +993,12 @@ def abrir_tabelaaulasalunos():
     if 'id_usuario' not in session:
         return redirect(url_for('login'))
 
-    cursor= con.cursor()
+    id_usuario = session['id_usuario']
+
+    cursor = con.cursor()
     try:
-        cursor.execute("""SELECT a.id_aulas
+        cursor.execute(""" 
+                                    SELECT a.id_aulas
                                          , u.nome AS professor
                                          , m.nome AS modalidade
                                          , a.capacidade
@@ -1004,16 +1011,20 @@ def abrir_tabelaaulasalunos():
                                            CASE a.sexta   WHEN 1 THEN 'Sex ' ELSE '' END ||
                                            CASE a.sabado  WHEN 1 THEN 'Sab ' ELSE '' END AS dias_semana 
                                         , a.CAPACIDADE ||'/' ||(SELECT count(*) FROM AULAS_ALUNO aa 
-                                           WHERE aa.ID_AULAS  = a.id_aulas) AS capacidade_ocupacao
-                                    
+                                           WHERE aa.ID_AULAS  = a.id_aulas
+                                           and aa.situacao = 0) AS capacidade_ocupacao
+                                        , COALESCE((SELECT aa.SITUACAO  
+                                                      FROM AULAS_ALUNO AA 
+                                                     WHERE AA.ID_AULAS = A.ID_AULAS
+                                                       AND AA.ID_USUARIO = ?),1) AS SITUACAO          
                                   FROM aulas a
                                   INNER JOIN usuario u ON a.id_usuario = u.id_usuario
                                   INNER JOIN modalidade m ON a.id_modalidade = m.id_modalidade
                                   WHERE a.CAPACIDADE > (SELECT count(*) FROM AULAS_ALUNO aa 
-                                                         WHERE aa.ID_AULAS  = a.id_aulas) 
-                               """)
+                                                         WHERE aa.ID_AULAS  = a.id_aulas
+                                                         and aa.situacao = 0) 
+                               """, (id_usuario,))
         aulas = cursor.fetchall()
-        print(aulas)
     finally:
         cursor.close()
     return render_template('tabelaAulas.html', aulas=aulas)
@@ -1065,37 +1076,171 @@ def abrir_tabelaaulasalunos():
 #         cursor.close()
 #         return redirect(url_for('abrir_dashbordaluno', id=id_usuario))
 
+#
+# @app.route('/inscrever/<int:id>', methods=['GET', 'POST'])
+# def inscrever(id):
+#     if 'id_usuario' not in session:
+#         return redirect(url_for('login'))
+#
+#     id_usuario = session['id_usuario']
+#     inscricao = request.form.get('inscricao')
+#     cursor = con.cursor()
+#
+#     # Contar alunos inscritos e comparar com a capacidade
+#     cursor.execute("""
+#                        SELECT COUNT(*)
+#                        FROM AULAS_ALUNO
+#                        WHERE ID_AULAS = ?
+#                          AND SITUACAO = 0
+#                    """, (id,))
+#     inscritos = cursor.fetchone()[0]
+#     print(inscritos)
+#
+#     cursor.execute("SELECT CAPACIDADE FROM AULAS WHERE ID_AULAS = ?", (id,))
+#     capacidade_total = cursor.fetchone()[0]
+#     print(capacidade_total)
+#
+#     capacidade = f"{inscritos}/{capacidade_total}"
+#     print(capacidade)
+#
+#     try:
+#
+#         if inscricao == 0:
+#             # Pegar dados da nova aula
+#             cursor.execute("""
+#                 SELECT HORA, HORA_FIM, SEGUNDA, TERCA, QUARTA, QUINTA, SEXTA, SABADO
+#                 FROM AULAS
+#                 WHERE ID_AULAS = ?
+#             """, (id,))
+#             nova_aula = cursor.fetchone()
+#
+#             if not nova_aula:
+#                 flash('Aula não encontrada.', 'error')
+#                 return redirect(url_for('abrir_tabelaaulasalunos'))
+#
+#             hora_inicio, hora_fim, segunda, terca, quarta, quinta, sexta, sabado = nova_aula
+#
+#             # Verificar conflito de horário
+#             cursor.execute("""
+#                 SELECT 1
+#                 FROM AULAS_ALUNO aa
+#                 INNER JOIN AULAS a ON a.ID_AULAS = aa.ID_AULAS
+#                 WHERE aa.ID_USUARIO = ?
+#                   AND (
+#                         (a.SEGUNDA = 1 AND ? = 1) OR
+#                         (a.TERCA   = 1 AND ? = 1) OR
+#                         (a.QUARTA  = 1 AND ? = 1) OR
+#                         (a.QUINTA  = 1 AND ? = 1) OR
+#                         (a.SEXTA   = 1 AND ? = 1) OR
+#                         (a.SABADO  = 1 AND ? = 1)
+#                       )
+#                   AND (
+#                         (? BETWEEN a.HORA AND a.HORA_FIM)
+#                      OR (a.HORA BETWEEN ? AND ?)
+#                      OR (? BETWEEN a.HORA AND a.HORA_FIM)
+#                       )
+#             """, (
+#                 id_usuario,
+#                 segunda, terca, quarta, quinta, sexta, sabado,
+#                 hora_inicio, hora_inicio, hora_fim, hora_fim
+#             ))
+#
+#             conflito = cursor.fetchone()
+#
+#             if conflito:
+#                 flash('Esse aluno já tem uma aula nesse horário!', 'error')
+#                 return redirect(url_for('abrir_tabelaaulasalunos'))
+#
+#             # Fazer inscrição
+#             cursor.execute("""
+#                 INSERT INTO AULAS_ALUNO (ID_AULAS, ID_USUARIO, SITUACAO)
+#                 VALUES (?, ?, 0)
+#             """, (id, id_usuario))
+#             con.commit()
+#
+#             flash('Inscrição realizada com sucesso!', 'success')
+#
+#
+#         if inscricao == 1:
+#             cursor.execute("""update aulas_aluno set situacao = 1 where id_usuario = ? and id_aulas= ?""", (id_usuario, id))
+#
+#
+#
+#     except Exception as e:
+#         con.rollback()
+#         flash(f'Erro ao inscrever: {e}', 'error')
+#
+#     finally:
+#         cursor.close()
+#
+#     return redirect(url_for('abrir_dashbordaluno', id=id_usuario, capacidade=capacidade))
+#
 
-@app.route('/inscrever/<int:id>', methods=['GET', 'POST'])
+
+@app.route('/inscrever/<int:id>', methods=['POST'])
 def inscrever(id):
     if 'id_usuario' not in session:
         return redirect(url_for('login'))
 
     id_usuario = session['id_usuario']
+    inscricao = request.form.get('inscricao')
     cursor = con.cursor()
 
     try:
-        # Pegar dados da nova aula
+        # Verificar se o usuário já está inscrito nesta aula
         cursor.execute("""
-            SELECT HORA, HORA_FIM, SEGUNDA, TERCA, QUARTA, QUINTA, SEXTA, SABADO
-            FROM AULAS
-            WHERE ID_AULAS = ?
-        """, (id,))
-        nova_aula = cursor.fetchone()
+            SELECT SITUACAO 
+            FROM AULAS_ALUNO 
+            WHERE ID_AULAS = ? AND ID_USUARIO = ?
+        """, (id, id_usuario))
 
-        if not nova_aula:
-            flash('Aula não encontrada.', 'error')
-            return redirect(url_for('abrir_tabelaaulasalunos'))
+        inscricao_existente = cursor.fetchone()
 
-        hora_inicio, hora_fim, segunda, terca, quarta, quinta, sexta, sabado = nova_aula
+        # Converter para inteiro para comparação
+        acao = int(inscricao)
 
-        # Verificar conflito de horário
-        cursor.execute("""
-            SELECT 1
-            FROM AULAS_ALUNO aa
-            INNER JOIN AULAS a ON a.ID_AULAS = aa.ID_AULAS
-            WHERE aa.ID_USUARIO = ?
-              AND (
+        if acao == 0:  # INSCREVER
+            # Verificar se já está inscrito ativamente
+            if inscricao_existente and inscricao_existente[0] == 0:
+                flash('Você já está inscrito nesta aula!', 'error')
+                return redirect(url_for('abrir_dashbordaluno', id=id_usuario))
+
+            # Verificar capacidade da aula
+            cursor.execute("""
+                SELECT COUNT(*) 
+                FROM AULAS_ALUNO 
+                WHERE ID_AULAS = ? AND SITUACAO = 0
+            """, (id,))
+            inscritos = cursor.fetchone()[0]
+
+            cursor.execute("SELECT CAPACIDADE FROM AULAS WHERE ID_AULAS = ?", (id,))
+            capacidade_total = cursor.fetchone()[0]
+
+            if inscritos >= capacidade_total:
+                flash('A aula atingiu a capacidade máxima!', 'error')
+                return redirect(url_for('abrir_dashbordaluno', id=id_usuario))
+
+            # Verificar conflito de horário
+            cursor.execute("""
+                SELECT a.HORA, a.HORA_FIM, a.SEGUNDA, a.TERCA, a.QUARTA, a.QUINTA, a.SEXTA, a.SABADO
+                FROM AULAS a
+                WHERE a.ID_AULAS = ?
+            """, (id,))
+            nova_aula = cursor.fetchone()
+
+            if not nova_aula:
+                flash('Aula não encontrada.', 'error')
+                return redirect(url_for('abrir_dashbordaluno', id=id_usuario))
+
+            hora_inicio, hora_fim, segunda, terca, quarta, quinta, sexta, sabado = nova_aula
+
+            cursor.execute("""
+                SELECT 1
+                FROM AULAS_ALUNO aa
+                INNER JOIN AULAS a ON a.ID_AULAS = aa.ID_AULAS
+                WHERE aa.ID_USUARIO = ? 
+                  AND aa.SITUACAO = 0
+                  AND (
                     (a.SEGUNDA = 1 AND ? = 1) OR
                     (a.TERCA   = 1 AND ? = 1) OR
                     (a.QUARTA  = 1 AND ? = 1) OR
@@ -1103,62 +1248,72 @@ def inscrever(id):
                     (a.SEXTA   = 1 AND ? = 1) OR
                     (a.SABADO  = 1 AND ? = 1)
                   )
-              AND (
+                  AND (
+                    (? BETWEEN a.HORA AND a.HORA_FIM) OR
+                    (a.HORA BETWEEN ? AND ?) OR
                     (? BETWEEN a.HORA AND a.HORA_FIM)
-                 OR (a.HORA BETWEEN ? AND ?)
-                 OR (? BETWEEN a.HORA AND a.HORA_FIM)
                   )
-        """, (
-            id_usuario,
-            segunda, terca, quarta, quinta, sexta, sabado,
-            hora_inicio, hora_inicio, hora_fim, hora_fim
-        ))
+            """, (
+                id_usuario,
+                segunda, terca, quarta, quinta, sexta, sabado,
+                hora_inicio, hora_inicio, hora_fim, hora_fim
+            ))
 
-        conflito = cursor.fetchone()
+            conflito = cursor.fetchone()
 
-        if conflito:
-            flash('Esse aluno já tem uma aula nesse horário!', 'error')
-            return redirect(url_for('abrir_tabelaaulasalunos'))
+            if conflito:
+                flash('Você já tem uma aula neste horário!', 'error')
+                return redirect(url_for('abrir_dashbordaluno', id=id_usuario))
 
-        # Fazer inscrição
-        cursor.execute("""
-            INSERT INTO AULAS_ALUNO (ID_AULAS, ID_USUARIO, SITUACAO)
-            VALUES (?, ?, 0)
-        """, (id, id_usuario))
-        con.commit()
+            # Fazer inscrição (INSERT ou UPDATE se já existir registro inativo)
+            if inscricao_existente:
+                # Já existe registro, apenas reativar
+                cursor.execute("""
+                    UPDATE AULAS_ALUNO 
+                    SET SITUACAO = 0 
+                    WHERE ID_AULAS = ? AND ID_USUARIO = ?
+                """, (id, id_usuario))
+            else:
+                # Nova inscrição
+                cursor.execute("""
+                    INSERT INTO AULAS_ALUNO (ID_AULAS, ID_USUARIO, SITUACAO)
+                    VALUES (?, ?, 0)
+                """, (id, id_usuario))
 
-        flash('Inscrição realizada com sucesso!', 'success')
+            con.commit()
+            flash('Inscrição realizada com sucesso!', 'success')
 
-        # Contar alunos inscritos e comparar com a capacidade
-        cursor.execute("""
-                SELECT COUNT(*)
-                FROM AULAS_ALUNO
-                WHERE ID_AULAS = ?
-                  AND SITUACAO = 0
-            """, (id,))
-        inscritos = cursor.fetchone()[0]
-        print(inscritos)
+        elif acao == 1:  # CANCELAR INSCRIÇÃO
+            if not inscricao_existente:
+                flash('Você não está inscrito nesta aula!', 'error')
+                return redirect(url_for('abrir_dashbordaluno', id=id_usuario))
 
-        cursor.execute("SELECT CAPACIDADE FROM AULAS WHERE ID_AULAS = ?", (id,))
-        capacidade_total = cursor.fetchone()[0]
-        print(capacidade_total)
+            # Fazer cancelamento (UPDATE)
+            cursor.execute("""
+                UPDATE AULAS_ALUNO 
+                SET SITUACAO = 1 
+                WHERE ID_USUARIO = ? AND ID_AULAS = ?
+            """, (id_usuario, id))
 
-        capacidade = f"{inscritos}/{capacidade_total}"
-        print(capacidade)
+            con.commit()
+            flash('Inscrição cancelada com sucesso!', 'success')
 
     except Exception as e:
         con.rollback()
-        flash(f'Erro ao inscrever: {e}', 'error')
+        flash(f'Erro ao processar solicitação: {str(e)}', 'error')
+        print(f"Erro: {e}")
 
     finally:
         cursor.close()
 
-    return redirect(url_for('abrir_dashbordaluno', id=id_usuario, capacidade=capacidade))
+    return redirect(url_for('abrir_dashbordaluno', id=id_usuario))
 
 # -------------------------------------------------------
 # Relatório de vagas q sobram
 # -------------------------------------------------------
-#
+
+
+
 # -------------------------------------------------------
 # EXECUÇÃO DA APLICAÇÃO
 # -------------------------------------------------------
