@@ -66,9 +66,14 @@ def abrir_dashbordaluno(id):
     if 'id_usuario' not in session:
         return redirect(url_for('login'))
 
+
     cursor = con.cursor()
     cursor.execute('SELECT id_usuario, nome, email, telefone, cpf FROM usuario WHERE id_usuario = ?', (id,))
     usuario = cursor.fetchone()
+
+    if usuario[0] != (id) :
+        flash('Acesso negado, você não é Administrador!')
+        return redirect(url_for('login'))
 
     # Buscar aulas em que o aluno está inscrito
     cursor.execute("""
@@ -1042,13 +1047,7 @@ def abrir_tabelaaulasalunos():
                     WHERE aa.ID_AULAS = a.id_aulas
                     AND aa.situacao = 0
                 )
-                AND NOT EXISTS (
-                    SELECT 1 
-                    FROM AULAS_ALUNO aa2
-                    WHERE aa2.ID_USUARIO = ?
-                    AND aa2.ID_AULAS = a.id_aulas
-                    AND aa2.SITUACAO = 0
-                )
+
         """, (id_usuario,))
 
         aulas = cursor.fetchall()

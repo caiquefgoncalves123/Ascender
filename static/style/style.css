@@ -393,6 +393,10 @@ button:hover,
     align-self: center;
 }
 
+ .semaup{
+   justify-content: center;
+   }
+
 .dashboard section .caixa {
   border: 1px solid #999;
   border-radius: 10px;
@@ -567,6 +571,11 @@ button:hover,
 .tabela-aulas .btn-editar:hover,
 .tabela-aulas .edit-btn:hover {
   background-color: var(--azul-600);
+}
+
+.dashboardaluno .semaup{
+  justify-content: center;
+  position: absolute;
 }
 
 

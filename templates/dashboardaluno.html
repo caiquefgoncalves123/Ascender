@@ -42,12 +42,12 @@
   <!-- ===== MAIN ===== -->
   <main class="dashboard">
 
-    <h1 style="padding-bottom: 60px;">Olá, {{ usuario[1] }}!</h1>
+    <h1 style="padding-bottom: 60px;font-size: 35px;">Olá, {{ usuario[1] }}!</h1>
 
 
-     <h2 style="align-self:center;">Minhas aulas</h2>
+     <h2 style="margin-left:270px; ">Minhas aulas</h2>
         <!-- Link para tabela de aulas -->
-    <a style="align-self:center;" class="btn-inscrever" href="{{ url_for('abrir_tabelaaulasalunos') }}">Inscreva-se em novas aulas</a>
+    <a style="margin-left:270px; margin-bottom:20px;" class="btn-inscrever" href="{{ url_for('abrir_tabelaaulasalunos') }}">Inscreva-se em novas aulas</a>
 
 
 
@@ -75,7 +75,9 @@
           </div>
            {% endfor %}
         {% else %}
-          <p>Você ainda não está inscrito em nenhuma aula.</p>
+        <div>
+           <h4 class="caixa1" style="align-content: center; border-radius: 12px; padding: 20px; font-weight: 400; height: 175px;">Você ainda não está <br> inscrito em nenhuma aula.</h4>
+        </div>
         {% endif %}
 
         </div>
