@@ -49,6 +49,7 @@ def abrir_dashbordadm(id):
     cursor.execute("SELECT id_usuario, tipo FROM usuario WHERE id_usuario = ?", (session['id_usuario'],))
     tipo = cursor.fetchone()
 
+
     if tipo[1] == 2:
         flash('Acesso negado, você não é Administrador!')
         return redirect(url_for('login'))
@@ -613,20 +614,27 @@ def cadastroaula():
                 flash("A capacidade precisa ser maior que 0!", 'error')
                 return redirect(url_for('cadastroaula'))
 
+            if not (segunda or terca or quarta or quinta or sexta or sabado):
+                flash("Selecione pelo menos um dia da semana!", "error")
+                return redirect(url_for('cadastroaula'))
 
             # Verifica se a aula já está cadastrado
-            cursor.execute("""
-                SELECT 1
-                FROM AULAS
-                WHERE ID_USUARIO = ?
-                  AND (
-                        (SEGUNDA = 1 AND ? = 1) OR
-                        (TERCA   = 1 AND ? = 1) OR
-                        (QUARTA  = 1 AND ? = 1) OR
-                        (QUINTA  = 1 AND ? = 1) OR
-                        (SEXTA   = 1 AND ? = 1)
-                      )
-            """, (id_usuario, segunda, terca, quarta, quinta, sexta))
+            cursor.execute("""SELECT 1
+                            FROM AULAS
+                            WHERE ID_USUARIO = ?
+                              AND ((SEGUNDA = 1 AND ? = 1) OR
+                                    (TERCA   = 1 AND ?   = 1) OR
+                                    (QUARTA  = 1 AND ?  = 1) OR
+                                    (QUINTA  = 1 AND ?  = 1) OR
+                                    (SEXTA   = 1 AND ?   = 1) OR
+                                    (SABADO  = 1 AND ?  = 1))
+                              AND ((? BETWEEN HORA AND HORA_FIM)
+                                    OR (HORA BETWEEN ? AND ?)
+                                    OR (? BETWEEN HORA AND HORA_FIM));
+                            """,
+                           (id_usuario, segunda, terca,
+                            quarta, quinta, sexta, sabado,
+                            hora, hora, hora_fim, hora_fim))
             if cursor.fetchone():  # Verifica se a consulta retornou algum resultado
                 flash('Esse horário já está ocupado!', 'error')
                 return redirect(url_for('cadastroaula'))
@@ -1053,150 +1061,6 @@ def abrir_tabelaaulasalunos():
 # -------------------------------------------------------
 # Inscreva-se
 # -------------------------------------------------------
-# @app.route('/inscrever/<int:id>', methods=['GET', 'POST'])
-# def inscrever(id):
-#     if 'id_usuario' not in session:
-#         return redirect(url_for('login'))
-#     cursor = con.cursor()
-#     id_usuario = session['id_usuario']
-#     print(id_usuario)
-#     try:
-#         cursor.execute("""
-#             SELECT 1
-#             FROM AULAS_ALUNO aa
-#             INNER JOIN AULAS a ON a.ID_AULAS = aa.ID_AULAS
-#             WHERE aa.ID_USUARIO = ?   -- aluno
-#               AND (
-#                     (a.SEGUNDA = 1 AND ? = 1) OR
-#                     (a.TERCA   = 1 AND ? = 1) OR
-#                     (a.QUARTA  = 1 AND ? = 1) OR
-#                     (a.QUINTA  = 1 AND ? = 1) OR
-#                     (a.SEXTA   = 1 AND ? = 1) OR
-#                     (a.SABADO  = 1 AND ? = 1)
-#                   )
-#               AND (
-#                     (? BETWEEN a.HORA AND a.HORA_FIM)
-#                  OR (a.HORA BETWEEN ? AND ?)
-#                  OR (? BETWEEN a.HORA AND a.HORA_FIM)
-#                   )
-#         """,(id_usuario,))
-#         print(cursor.fetchone())
-#         # Se houver pelo menos um resultado, já existe conflito
-#         if cursor.fetchone():
-#             flash('Esse aluno já tem uma aula nesse horário!', 'error')
-#             return redirect(url_for('abrir_tabelaaulasalunos'))
-#
-#         cursor.execute(# COLOCAR ID_AULA, ID_USUARIO
-#             "INSERT INTO aulas_aluno (id_aulas, id_usuarios, situacao) VALUES (?,?,?)",
-#             (id, id_usuario, 0,)
-#         )
-#         print('vou comitar')
-#         con.commit()
-#     finally:
-#         cursor.close()
-#         return redirect(url_for('abrir_dashbordaluno', id=id_usuario))
-
-#
-# @app.route('/inscrever/<int:id>', methods=['GET', 'POST'])
-# def inscrever(id):
-#     if 'id_usuario' not in session:
-#         return redirect(url_for('login'))
-#
-#     id_usuario = session['id_usuario']
-#     inscricao = request.form.get('inscricao')
-#     cursor = con.cursor()
-#
-#     # Contar alunos inscritos e comparar com a capacidade
-#     cursor.execute("""
-#                        SELECT COUNT(*)
-#                        FROM AULAS_ALUNO
-#                        WHERE ID_AULAS = ?
-#                          AND SITUACAO = 0
-#                    """, (id,))
-#     inscritos = cursor.fetchone()[0]
-#     print(inscritos)
-#
-#     cursor.execute("SELECT CAPACIDADE FROM AULAS WHERE ID_AULAS = ?", (id,))
-#     capacidade_total = cursor.fetchone()[0]
-#     print(capacidade_total)
-#
-#     capacidade = f"{inscritos}/{capacidade_total}"
-#     print(capacidade)
-#
-#     try:
-#
-#         if inscricao == 0:
-#             # Pegar dados da nova aula
-#             cursor.execute("""
-#                 SELECT HORA, HORA_FIM, SEGUNDA, TERCA, QUARTA, QUINTA, SEXTA, SABADO
-#                 FROM AULAS
-#                 WHERE ID_AULAS = ?
-#             """, (id,))
-#             nova_aula = cursor.fetchone()
-#
-#             if not nova_aula:
-#                 flash('Aula não encontrada.', 'error')
-#                 return redirect(url_for('abrir_tabelaaulasalunos'))
-#
-#             hora_inicio, hora_fim, segunda, terca, quarta, quinta, sexta, sabado = nova_aula
-#
-#             # Verificar conflito de horário
-#             cursor.execute("""
-#                 SELECT 1
-#                 FROM AULAS_ALUNO aa
-#                 INNER JOIN AULAS a ON a.ID_AULAS = aa.ID_AULAS
-#                 WHERE aa.ID_USUARIO = ?
-#                   AND (
-#                         (a.SEGUNDA = 1 AND ? = 1) OR
-#                         (a.TERCA   = 1 AND ? = 1) OR
-#                         (a.QUARTA  = 1 AND ? = 1) OR
-#                         (a.QUINTA  = 1 AND ? = 1) OR
-#                         (a.SEXTA   = 1 AND ? = 1) OR
-#                         (a.SABADO  = 1 AND ? = 1)
-#                       )
-#                   AND (
-#                         (? BETWEEN a.HORA AND a.HORA_FIM)
-#                      OR (a.HORA BETWEEN ? AND ?)
-#                      OR (? BETWEEN a.HORA AND a.HORA_FIM)
-#                       )
-#             """, (
-#                 id_usuario,
-#                 segunda, terca, quarta, quinta, sexta, sabado,
-#                 hora_inicio, hora_inicio, hora_fim, hora_fim
-#             ))
-#
-#             conflito = cursor.fetchone()
-#
-#             if conflito:
-#                 flash('Esse aluno já tem uma aula nesse horário!', 'error')
-#                 return redirect(url_for('abrir_tabelaaulasalunos'))
-#
-#             # Fazer inscrição
-#             cursor.execute("""
-#                 INSERT INTO AULAS_ALUNO (ID_AULAS, ID_USUARIO, SITUACAO)
-#                 VALUES (?, ?, 0)
-#             """, (id, id_usuario))
-#             con.commit()
-#
-#             flash('Inscrição realizada com sucesso!', 'success')
-#
-#
-#         if inscricao == 1:
-#             cursor.execute("""update aulas_aluno set situacao = 1 where id_usuario = ? and id_aulas= ?""", (id_usuario, id))
-#
-#
-#
-#     except Exception as e:
-#         con.rollback()
-#         flash(f'Erro ao inscrever: {e}', 'error')
-#
-#     finally:
-#         cursor.close()
-#
-#     return redirect(url_for('abrir_dashbordaluno', id=id_usuario, capacidade=capacidade))
-#
-
-
 @app.route('/inscrever/<int:id>', methods=['POST'])
 def inscrever(id):
     if 'id_usuario' not in session:
@@ -1247,6 +1111,7 @@ def inscrever(id):
                 WHERE a.ID_AULAS = ?
             """, (id,))
             nova_aula = cursor.fetchone()
+
 
             if not nova_aula:
                 flash('Aula não encontrada.', 'error')
@@ -1320,8 +1185,8 @@ def inscrever(id):
 
     except Exception as e:
         con.rollback()
-        flash(f'Erro ao processar solicitação: {str(e)}', 'error')
-        print(f"Erro: {e}")
+        flash(f'Erro ao processar solicitação', 'error')
+
 
     finally:
         cursor.close()
@@ -1399,7 +1264,7 @@ def relatorio_aulas_esgotadas():
         return send_file(nome_arquivo, as_attachment=True, mimetype='application/pdf')
 
     except Exception as e:
-        flash(f"Erro ao gerar relatório: {e}", "error")
+        flash(f"Erro ao gerar relatório", "error")
         return redirect(url_for('abrir_tabelaaulasadm'))
     finally:
         cursor.close()
@@ -1410,7 +1275,6 @@ def relatorio_aulas_esgotadas():
 # -------------------------------------------------------
 # aulas que ainda restam vagas relatorio_aulas_disponiveis
 # -------------------------------------------------------
-
 
 @app.route('/relatorio_aulas_disponiveis', methods=['GET'])
 def relatorio_aulas_disponiveis():
@@ -1476,7 +1340,7 @@ def relatorio_aulas_disponiveis():
         return send_file(nome_arquivo, as_attachment=True, mimetype='application/pdf')
 
     except Exception as e:
-        flash(f"Erro ao gerar relatório: {e}", "error")
+        flash(f"Erro ao gerar relatório", "error")
         return redirect(url_for('abrir_tabelaaulasadm'))
     finally:
         cursor.close()
