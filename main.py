@@ -56,7 +56,27 @@ def abrir_dashbordadm(id):
 
     cursor.execute('select id_usuario, nome, email, telefone, cpf from usuario where id_usuario = ?', (id,))
     usuario = cursor.fetchone()
-    return render_template('dashbord_adm.html', usuario=usuario)
+    # Contar alunos (tipo = 2)
+    cursor.execute("SELECT COUNT(*) FROM usuario WHERE tipo = 2")
+    total_alunos = cursor.fetchone()[0]
+
+    # Contar professores (tipo = 1)
+    cursor.execute("SELECT COUNT(*) FROM usuario WHERE tipo = 1")
+    total_professores = cursor.fetchone()[0]
+
+    # Contar modalidades ativas
+    cursor.execute("SELECT COUNT(*) FROM modalidade WHERE COALESCE(situacao, 0) = 0")
+    total_modalidades = cursor.fetchone()[0]
+
+    # Contar aulas
+    cursor.execute("SELECT COUNT(*) FROM aulas")
+    total_aulas = cursor.fetchone()[0]
+
+
+    return render_template('dashbord_adm.html', usuario=usuario, total_alunos=total_alunos,
+                             total_professores=total_professores,
+                             total_modalidades=total_modalidades,
+                             total_aulas=total_aulas)
 
 # -------------------------------------------------------
 # DASHBOARD ALUNO
@@ -106,7 +126,7 @@ def abrir_dashbordaluno(id):
 def cadastro():
     if request.method == 'POST':
         # Coleta dados do formulário
-        nome = request.form['nome'].strip()
+        nome = request.form['nome'].strip().capitalize()
         email = request.form['email'].strip().lower()
         cpf = request.form['cpf'].strip()
         telefone = request.form['telefone'].strip()
@@ -1084,7 +1104,7 @@ def inscrever(id):
 
         if acao == 0:  # INSCREVER
             # Verificar se já está inscrito ativamente
-            if inscricao_existente and inscricao_existente[0] == 0:
+            if inscricao_existente and inscricao_existente[0] == 0: # Se a situação for 0 (não cancelada)
                 flash('Você já está inscrito nesta aula!', 'error')
                 return redirect(url_for('abrir_dashbordaluno', id=id_usuario))
 
@@ -1344,10 +1364,8 @@ def relatorio_aulas_disponiveis():
     finally:
         cursor.close()
 
-
-
 # -------------------------------------------------------
 # EXECUÇÃO DA APLICAÇÃO
 # -------------------------------------------------------
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host='0.0.0.0',debug=True)

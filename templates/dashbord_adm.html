@@ -4,8 +4,9 @@
     <meta charset="UTF-8">
     <title>Dashboard - Adm</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href=  "../static/style/style.css">
+    <link rel="stylesheet" href="../static/style/style.css">
 </head>
+
 <body>
     <!-- Barra de navegação -->
     <header>
@@ -15,10 +16,9 @@
         <div>
             <nav>
                 <a href="{{ url_for('index') }}">Sobre</a>
-                <a href="{{ url_for('logout') }}" >Logout</a>
+                <a href="{{ url_for('logout') }}">Logout</a>
             </nav>
         </div>
-
     </header>
 
     <!-- Conteúdo principal -->
@@ -27,74 +27,69 @@
 
         <!-- Seção de aulas -->
         <section class="admcaixa">
-            <!-- Exemplo de aula inscrita -->
             <div class="caixa">
+                <!-- Aulas -->
                 <div>
                     <h2>Aulas</h2>
                     <a href="{{ url_for('cadastroaula') }}">+ Cadastrar aula</a>
-
                     <div class="caixa1">
-                        <p>Total : 12</p>
+                        <p>Total: {{ total_aulas }}</p>
                         <a href="{{ url_for('abrir_tabelaaulasadm') }}">Ver detalhes</a>
                     </div>
                 </div>
-                        <div>
-                        <h2>Alunos</h2>
-                        <a href="{{ url_for('cadastro') }}">+ Cadastrar aluno</a>
-                        <div class="caixa1">
 
-                            <p>  Total: {{ qtd }} </p>
-                            <a href="{{ url_for('ver_alunos') }}" class="botao-detalhes">Ver Detalhes</a>
-                        </div>
-                           </div>
+                <!-- Alunos -->
+                <div>
+                    <h2>Alunos</h2>
+                    <a href="{{ url_for('cadastro') }}">+ Cadastrar aluno</a>
+                    <div class="caixa1">
+                        <p>Total: {{ total_alunos }}</p>
+                        <a href="{{ url_for('ver_alunos') }}" class="botao-detalhes">Ver Detalhes</a>
+                    </div>
+                </div>
 
-                           <div>
-                                <h2>Professores</h2>
-                                <a href="{{ url_for('cadastroprofessor') }}">+ Cadastrar professor</a>
+                <!-- Professores -->
+                <div>
+                    <h2>Professores</h2>
+                    <a href="{{ url_for('cadastroprofessor') }}">+ Cadastrar professor</a>
+                    <div class="caixa1">
+                        <p>Total: {{ total_professores }}</p>
+                        <a href="{{ url_for('abrir_tabelaprofessores') }}">Ver detalhes</a>
+                    </div>
+                </div>
 
+                <!-- Modalidades -->
+                <div>
+                    <h2>Modalidades</h2>
+                    <a href="{{ url_for('cadastromodalidade') }}">+ Cadastrar modalidade</a>
+                    <div class="caixa1">
+                        <p>Total: {{ total_modalidades }}</p>
+                        <a href="{{ url_for('abrir_tabelamodalidade') }}">Ver detalhes</a>
+                    </div>
+                </div>
 
-                                <div class="caixa1">
-                                    <p>Total : 8</p>
-                                    <a href="{{ url_for('abrir_tabelaprofessores') }}">Ver detalhes</a>
-                                </div>
-                           </div>
-
-                           <div>
-                                <h2>Modalidades</h2>
-                                <a href="{{ url_for('cadastromodalidade') }}">+ Cadastrar modalidade</a>
-
-                                <div class="caixa1">
-                                    <p>Total : 5</p>
-                                    <a href="{{ url_for('abrir_tabelamodalidade') }}">Ver detalhes</a>
-                                </div>
-                           </div>
-
-                            <div class="relatorio">
-                              <h2>Relatórios</h2>
-
-                              <!-- Relatório de Aulas Esgotadas -->
-                              <div class="caixa1">
-                                <h3>Aulas Esgotadas</h3>
-                                <a href="{{ url_for('relatorio_aulas_esgotadas') }}" class="btn-baixar">Baixar</a>
-                              </div>
-
-                              <!-- Relatório de Aulas com Vagas Disponíveis -->
-                              <div class="caixa1">
-                                <h3>Aulas com Vagas Disponíveis</h3>
-                                <a href="{{ url_for('relatorio_aulas_disponiveis') }}" class="btn-baixar">Baixar</a>
-                              </div>
-                            </div>
+                <!-- Relatórios -->
+                <div class="relatorio">
+                    <h2>Relatórios</h2>
+                    <div style="    margin-bottom: 20px;" class="caixa1">
+                        <h3>Aulas Esgotadas</h3>
+                        <a href="{{ url_for('relatorio_aulas_esgotadas') }}" class="btn-baixar">Baixar</a>
+                    </div>
+                    <div class="caixa1">
+                        <h3>Aulas com Vagas Disponíveis</h3>
+                        <a href="{{ url_for('relatorio_aulas_disponiveis') }}" class="btn-baixar">Baixar</a>
+                    </div>
+                </div>
             </div>
         </section>
     </main>
-</body>
+
     <footer style="max-width: 100%;" class="rodape">
         <div class="conteudo-rodape">
             <div class="coluna-esquerda">
                 <h3 style="font-size: 30px;">ASCENDER</h3>
                 <p style="font-size: 15px;"><a href="home.html">SOBRE NÓS</a></p>
             </div>
-
             <div class="coluna-direita">
                 <p style="font-size: 20px;">Rua das Acácias, 123</p>
                 <p style="font-size: 20px;">Bairro Jardim Primavera</p>
@@ -103,4 +98,6 @@
             </div>
         </div>
     </footer>
+</body>
+
 </html>
