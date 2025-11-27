@@ -35,35 +35,42 @@
   <div class="container">
     <div class="cadastro">
       <h2>Editar Professor</h2>
-      <form method="POST" action="{{ url_for('editar_professor', id=professor[0]) }}">
-        <input name="nome" id="nome" type="text" value="{{ professor[1] }}" placeholder="Nome" required pattern="[A-Za-zÀ-ÿ\s]+" title="Somente letras são permitidas">
-        <input name="email" id="email" type="email" value="{{ professor[2] }}" placeholder="Email">
-        <input name="cpf"
-         id="cpf"
-         type="text"
-         value="{{ professor[5] }}"
-         placeholder="CPF"
-         pattern="[0-9]{11}"
-         maxlength="11"
-         inputmode="numeric"
-         oninput="this.value = this.value.replace(/\D/g, '').slice(0,11);"
-         title="Digite apenas números (11 dígitos)"
-         required>
-        <input name="telefone"
-         id="telefone"
-         type="text"
-         value="{{ professor[3] }}"
-         placeholder="Telefone (DDD + número)"
-         pattern="[0-9]{11}"
-         maxlength="11"
-         inputmode="numeric"
-         oninput="this.value = this.value.replace(/\D/g, '').slice(0,11);"
-         title="Digite apenas números (11 dígitos)"
-         required>
-        <div>
-          <button type="submit" class="save-btn">Salvar</button>
-        </div>
-      </form>
+              <form method="POST" enctype="multipart/form-data" action="{{ url_for('editar_professor', id=professor[0]) }}">
+
+          <input name="nome" id="nome" type="text" value="{{ professor[1] }}" placeholder="Nome" required pattern="[A-Za-zÀ-ÿ\s]+" title="Somente letras são permitidas">
+
+          <input name="email" id="email" type="email" value="{{ professor[2] }}" placeholder="Email">
+
+          <input name="cpf"
+                 id="cpf"
+                 type="text"
+                 value="{{ professor[5] }}"
+                 placeholder="CPF"
+                 pattern="[0-9]{11}"
+                 maxlength="11"
+                 inputmode="numeric"
+                 oninput="this.value = this.value.replace(/\D/g, '').slice(0,11);"
+                 required>
+
+          <input name="telefone"
+                 id="telefone"
+                 type="text"
+                 value="{{ professor[3] }}"
+                 placeholder="Telefone (DDD + número)"
+                 pattern="[0-9]{11}"
+                 maxlength="11"
+                 inputmode="numeric"
+                 oninput="this.value = this.value.replace(/\D/g, '').slice(0,11);"
+                 required>
+
+          <!-- Campo para trocar a foto -->
+            <input type="file" name="arquivo" id="arquivo" accept="image/*">
+
+          <div>
+            <button type="submit" class="save-btn">Salvar</button>
+          </div>
+        </form>
+
     </div>
     <div class="text-container">
       <p>Edite os dados do professor e mantenha as informações sempre corretas.</p>

@@ -135,7 +135,7 @@ def cadastro():
 
         # Verifica se as senhas coincidem
         if senha != confirma:
-            flash("Senhas não coincidem!")
+            flash("Senhas não coincidem!", "error")
             return redirect(url_for('cadastro'))
 
         if not nome:
@@ -797,7 +797,7 @@ def cadastroprofessor():
 # -------------------------------------------------------
 # EDITAR PROFESSOR
 # -------------------------------------------------------
-@app.route('/editar_professor/<int:id>', methods=['GET', F'POST'])
+@app.route('/editar_professor/<int:id>', methods=['GET', 'POST'])
 def editar_professor(id):
     cursor = con.cursor()
     cursor.execute("SELECT id_usuario, tipo FROM usuario WHERE id_usuario = ?", (session['id_usuario'],))
@@ -815,24 +815,18 @@ def editar_professor(id):
         flash("Usuário não foi encontrado")
         return redirect(url_for('cadastroprofessor'))
 
-
     if request.method == 'POST':
         nome = request.form['nome'].capitalize().strip()
         email = request.form['email'].lower()
         cpf = request.form['cpf']
         telefone = request.form['telefone']
 
-        if not nome:
-            flash("O nome não pode estar vazio.", "error")
-            return redirect(url_for('editar_professor', id=id))
+        # FOTO
+        arquivo = request.files.get('arquivo')
+        if arquivo and arquivo.filename != "":
+            arquivo.save(f'static/uploads/foto{id}.jpg')
 
-        # Verifica se o email já existe
-        cursor.execute("SELECT 1 FROM usuario WHERE email = ? AND id_usuario != ?", (email, id))
-        if cursor.fetchone():
-            flash('Esse e-mail já está cadastrado!', 'error')
-            return redirect(url_for('editar_professor', id=id))
-
-        # Atualiza os dados no banco
+        # Atualiza os dados
         cursor.execute(
             "UPDATE usuario SET nome = ?, email = ?, cpf = ?, telefone = ? WHERE id_usuario = ?",
             (nome, email, cpf, telefone, id)
@@ -840,12 +834,11 @@ def editar_professor(id):
         con.commit()
         cursor.close()
 
-
-        # Redireciona conforme o tipo de usuário
         if session['usuario'][5] == 0:
             return redirect(url_for('abrir_tabelaprofessores', id=professor[0]))
 
-    return render_template('editarProfessor.html', professor=professor)
+    foto = f"../static/uploads/foto{id}.jpg"
+    return render_template('editarProfessor.html', professor=professor, foto=foto)
 
 # -------------------------------------------------------
 # ABRIR TABELA Modalidade
