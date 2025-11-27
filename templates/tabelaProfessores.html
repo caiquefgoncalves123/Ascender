@@ -35,7 +35,9 @@
   <!-- Conteúdo -->
   <main class="dashboard">
     <h2 style="    margin-bottom: 20px;" class="titulo-tabela">TABELA DE PROFESSORES</h2>
+    <div>
     <a class="cadasau" href="{{ url_for('cadastroprofessor') }}"> Cadastrar professor</a>
+      </div>
 
     <table class="tabela-aulas">
       <thead>
@@ -53,7 +55,7 @@
             <tbody>
         {% for professor in professor %}
         <tr style="">
-          <td style="    display: inline-table;"><img style="border-radius:100%; height: 70px; width: 70px; "  src="../static/uploads/foto{{ professor[0] }}.jpg" /></td>
+          <td style="    display: inline-table;     margin-top: 4px;"><img style="border-radius:100%; height: 70px; width: 70px; "  src="../static/uploads/foto{{ professor[0] }}.jpg" /></td>
           <td data-label="Nome">
             {{ professor[1] }}
           </td> <!-- nome -->

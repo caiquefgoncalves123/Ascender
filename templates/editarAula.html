@@ -3,9 +3,11 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Editar Perfil - Ascender</title>
+  <title>Editar Aula | Ascender</title>
   <link rel="stylesheet" href="../static/style/style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&family=Poppins:wght@500;600;700&display=swap" rel="stylesheet">
 </head>
+
 <body>
   <!-- HEADER -->
   <header>
@@ -14,72 +16,101 @@
     </div>
     <nav>
       <a href="{{ url_for('index') }}">Sobre</a>
+      <a href="{{ url_for('abrir_tabelaaulasadm', id=session['id_usuario']) }}">Voltar</a>
     </nav>
   </header>
 
-  <!-- FORM -->
-  <div class="container">
-    <div class="cadastro">
-      <h2>Edite o perfil</h2>
+  <!-- FLASH -->
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      <div class="flash-messages">
+        {% for category, message in messages %}
+          <div class="flash {{ category }}">
+            <span class="close-btn" onclick="this.parentElement.style.display='none';">&times;</span>
+            {{ message }}
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+  {% endwith %}
 
-      <!-- Exibição das mensagens de erro -->
-      {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-          <ul class="alert-messages">
-            {% for category, message in messages %}
-              <li class="{{ category }}">{{ message }}</li>
-            {% endfor %}
-          </ul>
-        {% endif %}
-      {% endwith %}
+  <!-- MAIN -->
+  <main class="main">
+    <section class="cadastro">
+      <div class="intro">
+        <h2>Editar <br> aula</h2>
+      </div>
 
-      <form method="POST" action="{{ url_for('editar_usuario', id=usuario[0]) }}">
-        <input name="nome" id="nome" type="text" value="{{ usuario[1] }}" placeholder="Nome" required>
-        <input name="email" id="email" type="email" value="{{ usuario[2] }}" placeholder="Email" required>
-        <input name="cpf"
-         id="cpf"
-         type="text"
-         value="{{ usuario[6] }}"
-         placeholder="CPF"
-         pattern="[0-9]{11}"
-         maxlength="11"
-         inputmode="numeric"
-         oninput="this.value = this.value.replace(/\D/g, '').slice(0,11);"
-         title="Digite apenas números (11 dígitos)"
-         required>
-        <input name="telefone"
-         id="telefone"
-         type="text"
-         value="{{ usuario[4] }}"
-         placeholder="Telefone (DDD + número)"
-         pattern="[0-9]{11}"
-         maxlength="11"
-         inputmode="numeric"
-         oninput="this.value = this.value.replace(/\D/g, '').slice(0,11);"
-         title="Digite apenas números (11 dígitos)"
-         required>
-        <input name="senha" id="senha" type="password" placeholder="Senha">
+      <div class="cadastro-aula">
+        <div class="aula-coisas">
 
-        <div>
+          <form class="caform" method="POST" action="{{ url_for('editar_aula', id=aula[0]) }}">
+
+            <!-- Professor -->
+            <select class="select" name="id_usuario" id="id_usuario" required>
+              <option value="" disabled>Escolha o professor</option>
+              {% for p in professores %}
+                <option value="{{ p[0] }}" {% if p[0] == aula[1] %}selected{% endif %}>{{ p[1] }}</option>
+              {% endfor %}
+            </select>
+
+            <!-- Modalidade -->
+            <select class="select" name="id_modalidade" id="id_modalidade" required>
+              <option value="" disabled>Escolha modalidade</option>
+              {% for m in modalidades %}
+                <option value="{{ m[0] }}" {% if m[0] == aula[2] %}selected{% endif %}>{{ m[1] }}</option>
+              {% endfor %}
+            </select>
+
+            <!-- Horários -->
+            <input type="time" name="hora" value="{{ aula[9] }}" required>
+            <input type="time" name="hora_fim" value="{{ aula[10] }}" required>
+            <input type="number" name="capacidade" value="{{ aula[11] }}" min="1" required>
+
+        </div>
+
+        <!-- Dias -->
+        <div class="aula-dias">
+          <div>
+            <label><input type="checkbox" name="segunda" value="1" {% if aula[3] == 1 %}checked{% endif %}> Segunda</label>
+            <label><input type="checkbox" name="terca" value="1" {% if aula[4] == 1 %}checked{% endif %}> Terça</label>
+            <label><input type="checkbox" name="quarta" value="1" {% if aula[5] == 1 %}checked{% endif %}> Quarta</label>
+          </div>
+          <div>
+            <label><input type="checkbox" name="quinta" value="1" {% if aula[6] == 1 %}checked{% endif %}> Quinta</label>
+            <label><input type="checkbox" name="sexta" value="1" {% if aula[7] == 1 %}checked{% endif %}> Sexta</label>
+            <label><input type="checkbox" name="sabado" value="1" {% if aula[8] == 1 %}checked{% endif %}> Sábado</label>
+          </div>
+        </div>
+
+        <!-- Botões -->
+        <div class="btn">
           <button type="submit" class="save-btn">Salvar</button>
-          <a href="dashbord_adm.html" class="delete-btn">Cancelar</a>
         </div>
       </form>
-    </div>
-    <div class="text-container">
-      <p>Atualize seus dados e nos mantenha atualizados.</p>
-    </div>
-  </div>
 
-  <script src="../static/script.js"></script>
-</body>
+      <!-- Botão deletar -->
+      <form action="{{ url_for('deletar_aula', id=aula[0]) }}" method="post" class="btn" style="margin-top: 10px;">
+        <button type="submit" class="delete-btn" onclick="return confirm('Tem certeza que deseja deletar esta aula?')">Excluir aula</button>
+      </form>
+
+      </div>
+    </section>
+
+    <section class="p">
+      <p class="texto">
+        Altere os detalhes da aula conforme necessário.<br>
+        Não se esqueça de verificar conflitos de horário ao salvar.
+      </p>
+    </section>
+  </main>
 
   <!-- FOOTER -->
   <footer class="rodape">
     <div class="conteudo-rodape">
       <div class="coluna-esquerda">
         <h3>ASCENDER</h3>
-        <p><a href="home.html">Sobre nós</a></p>
+        <p><a href="{{ url_for('index') }}">Sobre nós</a></p>
       </div>
       <div class="coluna-direita">
         <p>Rua das Acácias, 123</p>
@@ -90,4 +121,5 @@
     </div>
   </footer>
 
+</body>
 </html>

@@ -33,7 +33,9 @@
 
   <main class="dashboard">
     <h2 class="titulo-tabela">TABELA DE AULAS</h2>
+    <div>
     <a class="cadasau" href="{{ url_for('cadastroaula') }}">Cadastrar aula</a>
+      </div>
 
     <table class="tabela-aulas">
       <thead>
@@ -44,6 +46,7 @@
           <th>Horário início</th>
           <th>Horário fim</th>
           <th>Capacidade</th>
+          <th>Ação</th>
         </tr>
       </thead>
       <tbody>
@@ -55,6 +58,9 @@
           <td data-label="Horário início">{{ aula[4] }}</td>
           <td data-label="Horário fim">{{ aula[5] }}</td>
           <td data-label="Capacidade">{{ aula[7] }}</td> <!-- capacidade total/ocupada -->
+                <td class="editar">
+                  <a href="{{ url_for('editar_aula', id=aula[0]) }}"><button>Editar</button></a>
+          </td>
         </tr>
         {% endfor %}
       </tbody>

@@ -144,7 +144,6 @@ main.dashboard {
   padding: 75px 24px;
   display: flex;
   gap: 200px;
-  align-items: center;
 }
 
 .intro {
@@ -1009,6 +1008,7 @@ button:hover,
   .cadastro {
     max-width: 97%;
     padding: 0 20px;
+    align-items:normal;
   }
 
   .cadastro-aula h2,
@@ -1025,6 +1025,7 @@ button:hover,
   .cadastro button {
     width: 100%;
   }
+
 }
 
 @media (max-width: 400px) {
@@ -1073,6 +1074,7 @@ button:hover,
   }
 
 
+
 }
 
 @media (max-width: 400px) {
@@ -1103,6 +1105,7 @@ button:hover,
 
   .container {
     flex-direction: row;
+    align-items: center;
   }
 
   .text-container p {
@@ -1346,6 +1349,7 @@ button:hover,
 @media (min-width: 767px) {
   .cadastro {
     margin-top: 25px;
+    align-items: normal;
   }
 }
 
@@ -1593,3 +1597,25 @@ button:hover,
     gap: 15px;
   }
 }
+
+@media (max-width: 600px) {
+      main.dashboard {
+        padding: 20px;
+        display: block;
+        overflow: scroll;
+        margin-bottom: -70px;
+        position: inherit;
+        margin-top: 0;
+    }
+}
+
+@media (max-width: 600px;) {
+  .minhasau{
+   margin-left: 0px;
+  }
+}
+
+
+
+
+

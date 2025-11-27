@@ -10,7 +10,7 @@ app.config['SECRET_KEY'] = 'sua_chave_secreta_aqui'  # Chave usada para proteger
 
 # Configuração da conexão com o banco de dados Firebird
 host = 'localhost'
-database = r'C:\Users\Aluno\Desktop\Ascender\ASCENDER.FDB'
+database = r'C:\Users\Aluno\Downloads\Ascender\ASCENDER.FDB'
 user = 'sysdba'
 password = 'sysdba'
 
@@ -220,6 +220,11 @@ def login():
                 flash('Usuário está inativo. Contate o administrador.', 'error')
                 return redirect(url_for('login'))
 
+            if usuario[5] == 1:
+                flash('Professor não pode fazer login.', 'error')
+                return redirect(url_for('login'))
+
+
             # Se a senha está correta
             if usuario and check_password_hash(usuario[0], senha):
                 cursor.execute("UPDATE usuario SET tentativas = 0 WHERE id_usuario = ?", (usuario[1],))
@@ -231,6 +236,9 @@ def login():
                 if usuario[5] == 0:
                     return redirect(url_for('abrir_dashbordadm', id=usuario[1]))
                 return redirect(url_for('abrir_dashbordaluno', id=usuario[1]))
+
+
+
 
             # Se errou senha (conta aluno), incrementa tentativas
             if usuario[4] < 2 and usuario[5] != 0:
@@ -1363,6 +1371,144 @@ def relatorio_aulas_disponiveis():
         return redirect(url_for('abrir_tabelaaulasadm'))
     finally:
         cursor.close()
+
+
+
+# -------------------------------------------------------
+# editar aula
+# -------------------------------------------------------
+@app.route('/editar_aula/<int:id>', methods=['GET', 'POST'])
+def editar_aula(id):
+
+    if 'id_usuario' not in session:
+        return redirect(url_for('login'))
+
+    cursor = con.cursor()
+
+    try:
+        # Verifica tipo usuário
+        cursor.execute("SELECT tipo FROM usuario WHERE id_usuario = ?", (session['id_usuario'],))
+        tipo = cursor.fetchone()
+
+        if tipo[0] == 2:  # não é admin
+            flash('Acesso negado!')
+            return redirect(url_for('login'))
+
+        # Carrega a aula atual
+        cursor.execute("""SELECT id_aulas, id_usuario, id_modalidade, segunda, terca, quarta,
+                                 quinta, sexta, sabado, hora, hora_fim, capacidade
+                          FROM aulas WHERE id_aulas = ?""", (id,))
+        aula = cursor.fetchone()
+
+        if not aula:
+            flash("Aula não encontrada!", "error")
+            return redirect(url_for('abrir_tabelaaulasadm'))
+
+        # Carrega professores e modalidades
+        cursor.execute("SELECT id_usuario, nome FROM usuario WHERE tipo = 1")
+        professores = cursor.fetchall()
+
+        cursor.execute("SELECT id_modalidade, nome FROM modalidade WHERE COALESCE(situacao,0) = 0")
+        modalidades = cursor.fetchall()
+
+        # ---------- POST (Atualizar aula) ----------
+        if request.method == 'POST':
+
+            id_usuario = request.form['id_usuario']
+            id_modalidade = request.form['id_modalidade']
+
+            segunda = 1 if 'segunda' in request.form else 0
+            terca   = 1 if 'terca'   in request.form else 0
+            quarta  = 1 if 'quarta'  in request.form else 0
+            quinta  = 1 if 'quinta'  in request.form else 0
+            sexta   = 1 if 'sexta'   in request.form else 0
+            sabado  = 1 if 'sabado'  in request.form else 0
+
+            hora = request.form['hora']
+            hora_fim = request.form['hora_fim']
+            capacidade = request.form['capacidade']
+
+            # ----- Validar horario -----
+            if hora > hora_fim:
+                flash("O horário do fim precisa ser maior que o início!", "error")
+                return redirect(url_for('editar_aula', id=id))
+
+            # ----- Validar capacidade -----
+            if capacidade <= '0':
+                flash("A capacidade precisa ser maior que 0!", "error")
+                return redirect(url_for('editar_aula', id=id))
+
+            # ----- Ao menos um dia -----
+            if not (segunda or terca or quarta or quinta or sexta or sabado):
+                flash("Selecione pelo menos um dia!", "error")
+                return redirect(url_for('editar_aula', id=id))
+
+            # ----- Verificar conflito de horário -----
+            cursor.execute("""
+                SELECT 1
+                FROM aulas
+                WHERE id_usuario = ?
+                  AND id_aulas != ?
+                  AND ((segunda = 1 AND ? = 1) OR
+                       (terca   = 1 AND ? = 1) OR
+                       (quarta  = 1 AND ? = 1) OR
+                       (quinta  = 1 AND ? = 1) OR
+                       (sexta   = 1 AND ? = 1) OR
+                       (sabado  = 1 AND ? = 1))
+                  AND ((? BETWEEN hora AND hora_fim)
+                    OR (hora BETWEEN ? AND ?)
+                    OR (? BETWEEN hora AND hora_fim));
+            """, (id_usuario, id,
+                  segunda, terca, quarta, quinta, sexta, sabado,
+                  hora, hora, hora_fim, hora_fim))
+
+            if cursor.fetchone():
+                flash("Esse horário já está ocupado!", "error")
+                return redirect(url_for('editar_aula', id=id))
+
+            # ----- Atualizar aula -----
+            cursor.execute("""
+                UPDATE aulas
+                   SET id_usuario = ?, id_modalidade = ?, segunda = ?, terca = ?, quarta = ?,
+                       quinta = ?, sexta = ?, sabado = ?, hora = ?, hora_fim = ?, capacidade = ?
+                 WHERE id_aulas = ?
+            """, (id_usuario, id_modalidade, segunda, terca, quarta,
+                  quinta, sexta, sabado, hora, hora_fim, capacidade, id))
+
+            con.commit()
+            flash("Aula atualizada com sucesso!", "success")
+            return redirect(url_for('abrir_tabelaaulasadm'))
+
+        return render_template('editarAula.html',
+                               aula=aula,
+                               professores=professores,
+                               modalidades=modalidades)
+
+    finally:
+        cursor.close()
+
+@app.route('/deletar_aula/<int:id>', methods=['POST'])
+def deletar_aula(id):
+
+    if 'id_usuario' not in session:
+        return redirect(url_for('login'))
+
+    cursor = con.cursor()
+
+    try:
+        cursor.execute("DELETE FROM aulas WHERE id_aulas = ?", (id,))
+        con.commit()
+        flash("Aula deletada com sucesso!", "success")
+    except:
+        con.rollback()
+        flash("Essa aula possui alunos vinculados.", "error")
+    finally:
+        cursor.close()
+
+    return redirect(url_for('abrir_tabelaaulasadm'))
+
+
+
 
 # -------------------------------------------------------
 # EXECUÇÃO DA APLICAÇÃO
